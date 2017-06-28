@@ -179,7 +179,7 @@ genrule {
     tools: [
         "launcher-build-config-tool",
     ],
-    cmd: " $(location launcher-build-config-tool) > $(out)",
+    cmd: " $(location launcher-build-config-tool) -d QSB_ON_FIRST_SCREEN > $(out)",
     out: ["BuildConfig.java"],
 }
 
@@ -446,7 +446,7 @@ genrule {
     tools: [
         "launcher-build-config-tool",
     ],
-    cmd: " $(location launcher-build-config-tool) -d WIDGETS_ENABLED -d NOTIFICATION_DOTS_ENABLED > $(out)",
+    cmd: " $(location launcher-build-config-tool) -d QSB_ON_FIRST_SCREEN -d WIDGETS_ENABLED -d NOTIFICATION_DOTS_ENABLED > $(out)",
     out: ["BuildConfig.java"],
 }
 
