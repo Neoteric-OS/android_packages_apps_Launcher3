@@ -20,7 +20,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.appwidget.AppWidgetProviderInfo
 import android.content.Context
 import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
@@ -293,18 +292,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             // On font / display change, the dp/px size of a cell changes, which means, existing
             // spans may be invalid. User should be able to resize to the correct widget size.
             verticalResizeActive =
-                info.hasVerticalResizeModeEnabled() &&
-                    ((minVSpan < numRows && maxVSpan > 1 && minVSpan < maxVSpan) ||
-                        isWidgetVSpanInvalid)
+                (minVSpan < numRows && maxVSpan > 1 && minVSpan < maxVSpan) ||
+                    isWidgetVSpanInvalid
             if (!verticalResizeActive) {
                 dragHandles.top.visibility = GONE
                 dragHandles.bottom.visibility = GONE
             }
 
             horizontalResizeActive =
-                info.hasHorizontalResizeModeEnabled() &&
-                    ((minHSpan < numColumns && maxHSpan > 1 && minHSpan < maxHSpan) ||
-                        isWidgetHSpanInvalid)
+                (minHSpan < numColumns && maxHSpan > 1 && minHSpan < maxHSpan) ||
+                    isWidgetHSpanInvalid
             if (!horizontalResizeActive) {
                 dragHandles.left.visibility = GONE
                 dragHandles.right.visibility = GONE
@@ -1088,12 +1085,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 0
             }
         }
-
-        private fun AppWidgetProviderInfo.hasHorizontalResizeModeEnabled() =
-            resizeMode and AppWidgetProviderInfo.RESIZE_HORIZONTAL != 0
-
-        private fun AppWidgetProviderInfo.hasVerticalResizeModeEnabled() =
-            resizeMode and AppWidgetProviderInfo.RESIZE_VERTICAL != 0
 
         /**
          * The dots on each side of a resize frame. Prefer accessing these named variables when you
