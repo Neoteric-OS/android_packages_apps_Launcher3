@@ -958,4 +958,8 @@ public final class Utilities {
             android.os.Process.killProcess(android.os.Process.myPid());
         });
     }
+
+    public static boolean isWorkspaceEditAllowed(Context context) {
+        return !LauncherPrefs.WORKSPACE_LOCK.get(context);
+    }
 }
