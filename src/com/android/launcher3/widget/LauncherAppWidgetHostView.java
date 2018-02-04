@@ -49,6 +49,8 @@ import com.android.launcher3.touch.CustomActionsListener;
 import com.android.launcher3.touch.CustomEventsTouchHandler;
 import com.android.launcher3.touch.CustomTouchDelegate;
 import com.android.launcher3.touch.WorkspaceWidgetCustomActionsListener;
+import com.android.launcher3.Utilities;
+import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.views.ActivityContext;
 import com.android.launcher3.views.BaseDragLayer;
@@ -130,6 +132,7 @@ public class LauncherAppWidgetHostView extends BaseLauncherAppWidgetHostView
 
     @Override
     public boolean onLongClick(View view) {
+        if (!Utilities.isWorkspaceEditAllowed((Context) mActivityContext)) return true;
         beforeDragStart();
         view.performLongClick();
         return true;

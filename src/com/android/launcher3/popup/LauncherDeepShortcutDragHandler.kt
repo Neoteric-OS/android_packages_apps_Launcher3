@@ -23,6 +23,7 @@ import com.android.launcher3.AbstractFloatingView.TYPE_FOLDER
 import com.android.launcher3.AbstractFloatingView.closeOpenContainer
 import com.android.launcher3.BubbleTextView
 import com.android.launcher3.Launcher
+import com.android.launcher3.Utilities
 import com.android.launcher3.dragndrop.DragOptions
 import com.android.launcher3.dragndrop.DraggableView
 import com.android.launcher3.model.data.ItemInfoWithIcon
@@ -40,6 +41,10 @@ class LauncherDeepShortcutDragHandler(
             return
         }
         if ((itemInfo.runtimeStatusFlags and (ItemInfoWithIcon.FLAG_NOT_PINNABLE)) != 0) {
+            return
+        }
+        // Return early if workspace edit is disabled
+        if (!Utilities.isWorkspaceEditAllowed(launcher.applicationContext)) {
             return
         }
 
