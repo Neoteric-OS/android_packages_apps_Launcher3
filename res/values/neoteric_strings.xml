@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2023 Neoteric OS
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+
+    <!-- Application name -->
+    <string name="neoteric_app_name" translatable="false">Neoteric Launcher</string>
+
+</resources>
