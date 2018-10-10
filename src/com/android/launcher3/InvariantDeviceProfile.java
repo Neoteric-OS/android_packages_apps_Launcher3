@@ -37,6 +37,8 @@ import static com.android.launcher3.util.SimpleBroadcastReceiver.actionsFilter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -87,7 +89,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 @LauncherAppSingleton
-public class InvariantDeviceProfile {
+public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener {
 
     public static final String TAG = "IDP";
     // We do not need any synchronization for this variable as its only written on UI thread.
@@ -110,6 +112,8 @@ public class InvariantDeviceProfile {
 
     private static final float ICON_SIZE_DEFINED_IN_APP_DP = 48;
 
+    public static final String KEY_SHOW_DESKTOP_LABELS = "pref_desktop_show_labels";
+    public static final String KEY_SHOW_DRAWER_LABELS = "pref_drawer_show_labels";
     public static final String KEY_WORKSPACE_LOCK = "pref_workspace_lock";
 
     // Constants that affects the interpolation curve between statically defined device profile
@@ -248,6 +252,8 @@ public class InvariantDeviceProfile {
 
     public Point defaultWallpaperSize;
 
+    private Context mContext;
+
     private final List<OnIDPChangeListener> mChangeListeners = new CopyOnWriteArrayList<>();
 
     public TaskbarModeUtil taskbarModeUtil;
@@ -263,6 +269,10 @@ public class InvariantDeviceProfile {
             DaggerSingletonTracker lifeCycle,
             TaskbarModeUtil taskbarModeUtil,
             @Ui final LooperExecutor mainExecutor) {
+        mContext = context;
+        SharedPreferences sharedPrefs = LauncherPrefs.getPrefs(context);
+        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
+
         mDisplayController = dc;
         mWMProxy = wmProxy;
         this.taskbarModeUtil = taskbarModeUtil;
@@ -312,6 +322,13 @@ public class InvariantDeviceProfile {
                 mMainExecutor, i -> onConfigChanged());
         localeReceiver.register(actionsFilter(Intent.ACTION_LOCALE_CHANGED));
         lifeCycle.addCloseable(localeReceiver);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (KEY_SHOW_DESKTOP_LABELS.equals(key) || KEY_SHOW_DRAWER_LABELS.equals(key)) {
+            onConfigChanged();
+        }
     }
 
     private void initGrid(String gridName) {
