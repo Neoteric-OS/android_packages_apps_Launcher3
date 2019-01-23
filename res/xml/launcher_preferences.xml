@@ -45,6 +45,10 @@
         android:title="@string/settings_lock_layout_title"
         android:summaryOn="@string/settings_lock_layout_summary_on"
         android:summaryOff="@string/settings_lock_layout_summary_off" />
+        
+     <Preference
+        android:key="pref_trust_apps"
+        android:title="@string/trust_apps_manager_name" />
 
     <SwitchPreference
         android:key="pref_dt_gesture"
