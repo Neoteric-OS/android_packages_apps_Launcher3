@@ -8,4 +8,6 @@
     <!-- Application name -->
     <string name="neoteric_app_name" translatable="false">Neoteric Launcher</string>
 
+    <!-- Folder titles -->
+    <string name="google_folder_title" translatable="false">Google</string>
 </resources>
