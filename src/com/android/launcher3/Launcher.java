@@ -112,6 +112,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -397,6 +398,14 @@ public class Launcher extends StatefulActivity<LauncherState>
 
     protected WallpaperThemeManager mWallpaperThemeManager;
 
+    private boolean mNeedsRestart = false;
+
+    private final OnSharedPreferenceChangeListener mSharedPrefListener =
+            new OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {}
+            };
+
     public static Launcher getLauncher(Context context) {
         return fromContext(context);
     }
@@ -511,6 +520,8 @@ public class Launcher extends StatefulActivity<LauncherState>
                     RuleController.parseRules(this, R.xml.split_configuration));
         }
         mStartupLatencyLogger.logEnd(LAUNCHER_LATENCY_STARTUP_ACTIVITY_ON_CREATE);
+
+        mSharedPrefs.registerOnSharedPreferenceChangeListener(mSharedPrefListener);
     }
 
     @NonNull View getAccessibilityActionView() {
@@ -1112,6 +1123,10 @@ public class Launcher extends StatefulActivity<LauncherState>
         mLauncherUiState.setIsResumedActivity(true);
         DragView.removeAllViews(this);
         TraceHelper.INSTANCE.endSection();
+
+        if (mNeedsRestart) {
+            Utilities.restart(this);
+        }
     }
 
     @Override
@@ -1596,6 +1611,8 @@ public class Launcher extends StatefulActivity<LauncherState>
         LauncherAppState.getIDP(this).removeOnChangeListener(this);
         mOverlayManager.onActivityDestroyed();
         PillColorProvider.getInstance(mWorkspace.getContext()).unregisterObserver();
+
+        mSharedPrefs.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener);
     }
 
     public LauncherAccessibilityDelegate getAccessibilityDelegate() {
