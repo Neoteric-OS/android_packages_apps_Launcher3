@@ -124,6 +124,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -425,6 +426,14 @@ public class Launcher extends StatefulActivity<LauncherState>
     private final SettingsCache.OnChangeListener mNaturalScrollingChangedListener =
             enabled -> mIsNaturalScrollingEnabled = enabled;
 
+    private boolean mNeedsRestart = false;
+
+    private final OnSharedPreferenceChangeListener mSharedPrefListener =
+            new OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {}
+            };
+
     public static Launcher getLauncher(Context context) {
         return fromContext(context);
     }
@@ -612,6 +621,8 @@ public class Launcher extends StatefulActivity<LauncherState>
                     RuleController.parseRules(this, R.xml.split_configuration));
         }
         TestEventEmitter.sendEvent(TestEvent.LAUNCHER_ON_CREATE);
+
+        mSharedPrefs.registerOnSharedPreferenceChangeListener(mSharedPrefListener);
     }
 
     protected ModelCallbacks createModelCallbacks() {
@@ -1311,6 +1322,10 @@ public class Launcher extends StatefulActivity<LauncherState>
 
         DragView.removeAllViews(this);
         TraceHelper.INSTANCE.endSection();
+
+        if (mNeedsRestart) {
+            Utilities.restart(this);
+        }
     }
 
     @Override
@@ -1808,6 +1823,8 @@ public class Launcher extends StatefulActivity<LauncherState>
         getRootView().getViewTreeObserver().removeOnPreDrawListener(mOnInitialBindListener);
         mOverlayManager.onActivityDestroyed();
         PillColorProvider.getInstance(mWorkspace.getContext()).unregisterObserver();
+
+        mSharedPrefs.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener);
     }
 
     public LauncherAccessibilityDelegate getAccessibilityDelegate() {
