@@ -1110,6 +1110,7 @@ public class Launcher extends StatefulActivity<LauncherState>
         TraceHelper.INSTANCE.beginSection(ON_RESUME_EVT);
         super.onResume();
         mLauncherUiState.setIsResumedActivity(true);
+        LauncherAppState.checkIfRestartNeeded(this);
         DragView.removeAllViews(this);
         TraceHelper.INSTANCE.endSection();
     }
