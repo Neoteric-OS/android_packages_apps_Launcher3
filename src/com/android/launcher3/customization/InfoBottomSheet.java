@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragment;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.graphics.Rect;
 
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +25,17 @@ import com.android.launcher3.Launcher;
 import com.android.launcher3.QuickstepTransitionManager;
 import com.android.launcher3.uioverrides.QuickstepLauncher;
 import com.android.launcher3.R;
+import com.android.launcher3.util.ActivityOptionsWrapper;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.views.AbstractSlideInView;
 import com.android.launcher3.util.PackageManagerHelper;
+
+import com.android.launcher3.settings.preference.IconPackPrefSetter;
+import com.android.launcher3.settings.preference.ReloadingListPreference;
+import com.android.launcher3.util.AppReloader;
+
+import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
+import static com.android.launcher3.util.Executors.THREAD_POOL_EXECUTOR;
 
 /**
  * Bottom sheet showing app details for the "App info" long-press shortcut.
@@ -175,26 +185,63 @@ public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements In
             mComponent = itemInfo.getTargetComponent();
             mItemInfo = itemInfo;
             mKey = new ComponentKey(mComponent, itemInfo.user);
-            MetadataExtractor extractor = new MetadataExtractor(mContext, mComponent);
 
-            Preference iconPack = findPreference(KEY_ICON_PACK);
-            iconPack.setOnPreferenceChangeListener(this);
-            iconPack.setSummary(R.string.app_info_icon_pack_none);
-            findPreference(KEY_SOURCE).setSummary(extractor.getSource());
-            findPreference(KEY_LAST_UPDATE).setSummary(extractor.getLastUpdate());
-            findPreference(KEY_VERSION).setSummary(mContext.getString(
-                    R.string.app_info_version_value,
-                    extractor.getVersionName(),
-                    extractor.getVersionCode()));
-            findPreference(KEY_MORE).setOnPreferenceClickListener(this);
+            ReloadingListPreference icons = (ReloadingListPreference) findPreference(KEY_ICON_PACK);
+            icons.setValue(IconDatabase.getByComponent(mContext, mKey));
+            icons.setOnReloadListener(ctx -> new IconPackPrefSetter(ctx, mComponent));
+            icons.setOnPreferenceChangeListener(this);
+
+            THREAD_POOL_EXECUTOR.execute(() -> {
+                MetadataExtractor extractor = new MetadataExtractor(mContext, mComponent);
+
+                CharSequence source = extractor.getSource();
+                CharSequence lastUpdate = extractor.getLastUpdate();
+                CharSequence version = mContext.getString(
+                        R.string.app_info_version_value,
+                        extractor.getVersionName(),
+                        extractor.getVersionCode());
+                Intent marketIntent = extractor.getMarketIntent();
+
+                MAIN_EXECUTOR.execute(() -> {
+                    Preference sourcePref = findPreference(KEY_SOURCE);
+                    Preference lastUpdatePref = findPreference(KEY_LAST_UPDATE);
+                    Preference versionPref = findPreference(KEY_VERSION);
+                    Preference morePref = findPreference(KEY_MORE);
+
+                    sourcePref.setSummary(source);
+                    lastUpdatePref.setSummary(lastUpdate);
+                    versionPref.setSummary(version);
+                    morePref.setOnPreferenceClickListener(this);
+
+                    if (marketIntent != null) {
+                        sourcePref.setOnPreferenceClickListener(
+                                pref -> tryStartActivity(marketIntent));
+                    }
+                });
+            });
+        }
+
+        private boolean tryStartActivity(Intent intent) {
+            Launcher launcher = Launcher.getLauncher(mContext);
+            Bundle opts = getAppTransitionManager()
+                    .getActivityLaunchOptions(getView(), mItemInfo)
+                    .toBundle();
+            try {
+                launcher.startActivity(intent, opts);
+            } catch (Exception ignored) {
+            }
+            return false;
         }
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            if (KEY_ICON_PACK.equals(preference.getKey())) {
-                // Reload in launcher.
+            if (newValue.equals(IconDatabase.getGlobal(mContext))) {
+                IconDatabase.resetForComponent(mContext, mKey);
+            } else {
+                IconDatabase.setForComponent(mContext, mKey, (String) newValue);
             }
-            return false;
+            AppReloader.get(mContext).reload(mKey);
+            return true;
         }
 
         private void onMoreClick() {
@@ -204,10 +251,8 @@ public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements In
 
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            if (KEY_MORE.equals(preference.getKey())) {
-                  onMoreClick();
-            }
-            return false;
+            onMoreClick();
+            return true;
         }
     }
 }
