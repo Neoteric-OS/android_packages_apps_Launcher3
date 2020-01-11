@@ -34,6 +34,7 @@
     <!-- String representing the fragment class for settings activity.-->
     <string name="settings_fragment_name" translatable="false">com.android.launcher3.settings.SettingsActivity$LauncherSettingsFragment</string>
 
+
     <!-- DragController -->
     <item type="id" name="drag_event_parity" />
 
@@ -208,4 +209,6 @@
 
     <string name="floating_task_package" translatable="false"></string>
     <string name="floating_task_action" translatable="false"></string>
+
+    <string name="drawable_factory_class" translatable="false">com.android.launcher3.icons.ThirdPartyDrawableFactory</string>
 </resources>
