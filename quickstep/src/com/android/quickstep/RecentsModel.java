@@ -42,7 +42,7 @@ import com.android.launcher3.dagger.ApplicationContext;
 import com.android.launcher3.dagger.LauncherAppSingleton;
 import com.android.launcher3.graphics.ThemeManager;
 import com.android.launcher3.graphics.ThemeManager.ThemeChangeListener;
-import com.android.launcher3.icons.IconProvider;
+import com.android.launcher3.icons.ThirdPartyIconProvider;
 import com.android.launcher3.statehandlers.DesktopVisibilityController;
 import com.android.launcher3.util.DaggerSingletonObject;
 import com.android.launcher3.util.DaggerSingletonTracker;
@@ -110,14 +110,14 @@ public class RecentsModel implements RecentTasksDataSource, TaskStackChangeListe
             ) {
         // Lazily inject the ThemeManager and access themeManager once the device is
         // unlocked. See b/393248495 for details.
-        this(context, new IconProvider(context), systemUiProxy, topTaskTracker,
+        this(context, ThirdPartyIconProvider.INSTANCE.get(context), systemUiProxy, topTaskTracker,
                 displayController, lockedUserState, themeManagerLazy, desktopVisibilityController,
                 tracker);
     }
 
     @SuppressLint("VisibleForTests")
     private RecentsModel(@ApplicationContext Context context,
-            IconProvider iconProvider,
+            ThirdPartyIconProvider iconProvider,
             SystemUiProxy systemUiProxy,
             TopTaskTracker topTaskTracker,
             DisplayController displayController,
@@ -146,7 +146,7 @@ public class RecentsModel implements RecentTasksDataSource, TaskStackChangeListe
             RecentTasksList taskList,
             TaskIconCache iconCache,
             TaskThumbnailCache thumbnailCache,
-            IconProvider iconProvider,
+            ThirdPartyIconProvider iconProvider,
             TaskStackChangeListeners taskStackChangeListeners,
             LockedUserState lockedUserState,
             Lazy<ThemeManager> themeManagerLazy,

@@ -91,6 +91,7 @@ import com.android.launcher3.icons.DotRenderer;
 import com.android.launcher3.icons.FastBitmapDrawable;
 import com.android.launcher3.icons.IconCache.ItemInfoUpdateReceiver;
 import com.android.launcher3.icons.PlaceHolderIconDrawable;
+import com.android.launcher3.icons.ThirdPartyDrawableFactory;
 import com.android.launcher3.model.data.AppInfo;
 import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.model.data.ItemInfoWithIcon;
@@ -1280,7 +1281,8 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
     @NonNull
     private PreloadIconDrawable makePreloadIcon(ItemInfoWithIcon info) {
         int progressLevel = info.getProgressLevel();
-        final PreloadIconDrawable preloadDrawable = newPendingIcon(getContext(), info);
+        final PreloadIconDrawable preloadDrawable = ThirdPartyDrawableFactory.INSTANCE.get(getContext())
+                                                           .newPendingIcon(getContext(), info);
 
         preloadDrawable.setLevel(progressLevel);
         preloadDrawable.setIsDisabled(isIconDisabled(info));

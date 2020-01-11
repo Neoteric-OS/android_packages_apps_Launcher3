@@ -71,7 +71,7 @@ import com.android.internal.logging.InstanceId;
 import com.android.launcher3.R;
 import com.android.launcher3.anim.PendingAnimation;
 import com.android.launcher3.apppairs.AppPairIcon;
-import com.android.launcher3.icons.IconProvider;
+import com.android.launcher3.icons.ThirdPartyIconProvider;
 import com.android.launcher3.logging.StatsLogManager;
 import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.statehandlers.DepthController;
@@ -882,7 +882,7 @@ public class SplitSelectStateController {
             mTaskInfo = taskInfo;
             String packageName = mTaskInfo.realActivity.getPackageName();
             PackageManager pm = mLauncher.getApplicationContext().getPackageManager();
-            IconProvider provider = new IconProvider(mLauncher.getApplicationContext());
+            ThirdPartyIconProvider provider = ThirdPartyIconProvider.INSTANCE.get(mLauncher.getApplicationContext());
             try {
                 mAppIcon = provider.getIcon(pm.getActivityInfo(mTaskInfo.baseActivity,
                      PackageManager.ComponentInfoFlags.of(0)));

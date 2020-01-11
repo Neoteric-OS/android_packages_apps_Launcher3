@@ -37,7 +37,7 @@ import androidx.annotation.Nullable;
 
 import com.android.internal.jank.Cuj;
 import com.android.launcher3.anim.AnimationSuccessListener;
-import com.android.launcher3.icons.IconProvider;
+import com.android.launcher3.icons.ThirdPartyIconProvider;
 import com.android.quickstep.TaskAnimationManager;
 import com.android.systemui.shared.pip.PipSurfaceTransactionHelper;
 import com.android.systemui.shared.system.InteractionJankMonitorWrapper;
@@ -177,7 +177,7 @@ public class SwipePipToHomeAnimator extends RectFSpringAnim {
                     getEnterPipWithOverlaySrcRectHint(appBounds, aspectRatio.floatValue()));
             mPipContentOverlay = new PipContentOverlay.PipAppIconOverlay(view.getContext(),
                     mAppBounds, mDestinationBounds,
-                    new IconProvider(context).getIcon(mActivityInfo), appIconSizePx);
+                    ThirdPartyIconProvider.INSTANCE.get(context).getIcon(mActivityInfo), appIconSizePx);
             final SurfaceControl.Transaction tx = new SurfaceControl.Transaction();
             mPipContentOverlay.attach(tx, mLeash);
             Log.d(TAG, getContentOverlay() + " is created: " + reasonForCreateOverlay);

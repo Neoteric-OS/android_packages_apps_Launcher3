@@ -27,6 +27,8 @@ import com.android.launcher3.RemoveAnimationSettingsTracker;
 import com.android.launcher3.graphics.GridCustomizationsProxy;
 import com.android.launcher3.graphics.ThemeManager;
 import com.android.launcher3.icons.LauncherIcons.IconPool;
+import com.android.launcher3.icons.ThirdPartyDrawableFactory;
+import com.android.launcher3.icons.ThirdPartyIconProvider;
 import com.android.launcher3.model.ItemInstallQueue;
 import com.android.launcher3.model.LoaderCursor.LoaderCursorFactory;
 import com.android.launcher3.model.WidgetsFilterDataProvider;
@@ -92,6 +94,8 @@ public interface LauncherBaseAppComponent {
     LoaderCursorFactory getLoaderCursorFactory();
     WidgetHolderFactory getWidgetHolderFactory();
     RefreshRateTracker getFrameRateProvider();
+    ThirdPartyDrawableFactory getThirdPartyDrawableFactory();
+    ThirdPartyIconProvider getThirdPartyIconProvider();
 
     /** Builder for LauncherBaseAppComponent. */
     interface Builder {
