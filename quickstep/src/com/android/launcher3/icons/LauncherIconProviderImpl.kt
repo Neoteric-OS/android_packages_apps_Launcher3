@@ -44,7 +44,7 @@ import javax.inject.Provider
 private const val TAG = "LauncherIconProviderImpl"
 
 @LauncherAppSingleton
-class LauncherIconProviderImpl
+open class LauncherIconProviderImpl
 @Inject
 constructor(
     @ApplicationContext ctx: Context,
