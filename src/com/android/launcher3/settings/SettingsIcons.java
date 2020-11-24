@@ -18,42 +18,40 @@ package com.android.launcher3.settings;
 
 import static androidx.preference.PreferenceFragmentCompat.ARG_PREFERENCE_ROOT;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.annotation.Nullable;
 import androidx.core.view.WindowCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartFragmentCallback;
 import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartScreenCallback;
-import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceGroup.PreferencePositionCallback;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.launcher3.InvariantDeviceProfile;
+import com.android.launcher3.BuildConfig;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherFiles;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
+import com.android.launcher3.Utilities;
+import com.android.launcher3.model.WidgetsModel;
 
-/**
- * Settings activity for Launcher.
- */
-public class SettingsActivity extends FragmentActivity
-        implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback {
+import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
+
+public class SettingsIcons extends CollapsingToolbarBaseActivity
+        implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback,
+        SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private static final String NOTIFICATION_DOTS_PREFERENCE_KEY = "pref_icon_badging";
 
     public static final String EXTRA_FRAGMENT_ARGS = ":settings:fragment_args";
 
@@ -96,12 +94,17 @@ public class SettingsActivity extends FragmentActivity
 
             final FragmentManager fm = getSupportFragmentManager();
             final Fragment f = fm.getFragmentFactory().instantiate(getClassLoader(),
-                    getString(R.string.settings_fragment_name));
+                    getString(R.string.icons_settings_fragment_name));
             f.setArguments(args);
             // Display the fragment as the main content.
-            fm.beginTransaction().replace(R.id.content_frame, f).commit();
+            fm.beginTransaction().replace(
+                    com.android.settingslib.collapsingtoolbar.R.id.content_frame, f).commit();
         }
+        LauncherPrefs.getPrefs(getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
     }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) { }
 
     private boolean startPreference(String fragment, Bundle args, String key) {
         if (getSupportFragmentManager().isStateSaved()) {
@@ -115,7 +118,7 @@ public class SettingsActivity extends FragmentActivity
             f.setArguments(args);
             ((DialogFragment) f).show(fm, key);
         } else {
-            startActivity(new Intent(this, SettingsActivity.class)
+            startActivity(new Intent(this, SettingsIcons.class)
                     .putExtra(EXTRA_FRAGMENT_ARGS, args));
         }
         return true;
@@ -131,7 +134,7 @@ public class SettingsActivity extends FragmentActivity
     public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref) {
         Bundle args = new Bundle();
         args.putString(ARG_PREFERENCE_ROOT, pref.getKey());
-        return startPreference(getString(R.string.settings_title), args, pref.getKey());
+        return startPreference(getString(R.string.icons_category_title), args, pref.getKey());
     }
 
     @Override
@@ -146,12 +149,10 @@ public class SettingsActivity extends FragmentActivity
     /**
      * This fragment shows the launcher preferences.
      */
-    public static class LauncherSettingsFragment extends PreferenceFragmentCompat {
-
-        private boolean mRestartOnResume = false;
+    public static class IconsSettingsFragment extends PreferenceFragmentCompat implements
+            SharedPreferences.OnSharedPreferenceChangeListener {
 
         private String mHighLightKey;
-
         private boolean mPreferenceHighlighted = false;
 
         @Override
@@ -164,45 +165,33 @@ public class SettingsActivity extends FragmentActivity
             }
 
             getPreferenceManager().setSharedPreferencesName(LauncherFiles.SHARED_PREFERENCES_KEY);
-            setPreferencesFromResource(R.xml.launcher_preferences, rootKey);
+            setPreferencesFromResource(R.xml.launcher_icons_preferences, rootKey);
+
+            updatePreferences();
+
+            LauncherPrefs.getPrefs(getContext())
+                    .registerOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onDestroyView () {
+            LauncherPrefs.getPrefs(getContext())
+                .unregisterOnSharedPreferenceChangeListener(this);
+            super.onDestroyView();
+        }
+
+        private void updatePreferences() {
+            PreferenceScreen screen = getPreferenceScreen();
+            for (int i = screen.getPreferenceCount() - 1; i >= 0; i--) {
+                Preference preference = screen.getPreference(i);
+                if (!initPreference(preference)) {
+                    screen.removePreference(preference);
+                }
+            }
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {
                 getActivity().setTitle(getPreferenceScreen().getTitle());
             }
-        }
-
-        private boolean isKeyInPreferenceGroup(String targetKey, PreferenceGroup parent) {
-            for (int i = 0; i < parent.getPreferenceCount(); i++) {
-                Preference pref = parent.getPreference(i);
-                if (pref.getKey() != null && pref.getKey().equals(targetKey)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Finds the parent preference screen for the given target key.
-         *
-         * @param parent    the parent preference screen
-         * @param targetKey the key of the preference to find
-         * @return the parent preference screen that contains the target preference
-         */
-        @Nullable
-        private PreferenceScreen findParentPreference(PreferenceScreen parent, String targetKey) {
-            for (int i = 0; i < parent.getPreferenceCount(); i++) {
-                Preference pref = parent.getPreference(i);
-                if (pref instanceof PreferenceScreen) {
-                    PreferenceScreen foundKey = findParentPreference((PreferenceScreen) pref,
-                            targetKey);
-                    if (foundKey != null) {
-                        return foundKey;
-                    }
-                } else if (pref.getKey() != null && pref.getKey().equals(targetKey)) {
-                    return parent;
-                }
-            }
-            return null;
         }
 
         @Override
@@ -230,6 +219,22 @@ public class SettingsActivity extends FragmentActivity
         }
 
         @Override
+        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) { }
+
+        /**
+         * Initializes a preference. This is called for every preference. Returning false here
+         * will remove that preference from the list.
+         */
+        protected boolean initPreference(Preference preference) {
+            switch (preference.getKey()) {
+                case NOTIFICATION_DOTS_PREFERENCE_KEY:
+                    return BuildConfig.NOTIFICATION_DOTS_ENABLED;
+            }
+
+            return true;
+        }
+
+        @Override
         public void onResume() {
             super.onResume();
 
@@ -239,28 +244,6 @@ public class SettingsActivity extends FragmentActivity
                     getView().postDelayed(highlighter, DELAY_HIGHLIGHT_DURATION_MILLIS);
                     mPreferenceHighlighted = true;
                 }
-            }
-
-            if (mRestartOnResume) {
-                recreateActivityNow();
-            }
-        }
-
-        /**
-         * Tries to recreate the preference
-         */
-        protected void tryRecreateActivity() {
-            if (isResumed()) {
-                recreateActivityNow();
-            } else {
-                mRestartOnResume = true;
-            }
-        }
-
-        private void recreateActivityNow() {
-            Activity activity = getActivity();
-            if (activity != null) {
-                activity.recreate();
             }
         }
 
@@ -281,5 +264,9 @@ public class SettingsActivity extends FragmentActivity
                     list, position, screen.findPreference(mHighLightKey))
                     : null;
         }
+    }
+
+    public interface OnResumePreferenceCallback {
+        void onResume();
     }
 }
