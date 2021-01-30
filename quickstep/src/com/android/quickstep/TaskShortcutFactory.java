@@ -45,6 +45,7 @@ import com.android.launcher3.logging.StatsLogManager.LauncherEvent;
 import com.android.launcher3.popup.SystemShortcut;
 import com.android.launcher3.popup.SystemShortcut.AppInfo;
 import com.android.launcher3.util.InstantAppResolver;
+import com.android.launcher3.util.PackageManagerHelper;
 import com.android.launcher3.util.SplitConfigurationOptions;
 import com.android.launcher3.util.SplitConfigurationOptions.SplitPositionOption;
 import com.android.quickstep.orientation.RecentsPagedOrientationHandler;
@@ -369,6 +370,12 @@ public interface TaskShortcutFactory {
             return true;
         }
     };
+
+    TaskShortcutFactory UNINSTALL = (activity, taskContainer) ->
+            PackageManagerHelper.isSystemApp(activity,
+                 taskContainer.getTask().getTopComponent().getPackageName())
+                    ? null : new SystemShortcut.UnInstall(activity,
+                    taskContainer.getItemInfo(), taskContainer.getTaskView());
 
     TaskShortcutFactory FREE_FORM = new TaskShortcutFactory() {
         @Override
