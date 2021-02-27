@@ -119,5 +119,33 @@
             android:persistent="false"
             android:widgetLayout="@layout/notification_pref_warning" />
 
+        <com.android.launcher3.settings.preferences.PercentSliderPreference
+        android:key="pref_icon_size"
+        android:title="@string/icon_size_title"
+        android:persistent="true"
+        android:max="200"
+        android:defaultValue="100"
+        launcher:min="50"
+        launcher:seekBarIncrement="5"
+        launcher:showSeekBarValue="true"
+        launcher:iconStart="@drawable/ic_slider_minus"
+        launcher:iconStartContentDescription="@string/icon_size_make_smaller_desc"
+        launcher:iconEnd="@drawable/ic_slider_plus"
+        launcher:iconEndContentDescription="@string/icon_size_make_larger_desc" />
+
+        <com.android.launcher3.settings.preferences.PercentSliderPreference
+        android:key="pref_font_size"
+        android:title="@string/font_size_title"
+        android:persistent="true"
+        android:max="200"
+        android:defaultValue="100"
+        launcher:min="50"
+        launcher:seekBarIncrement="5"
+        launcher:showSeekBarValue="true"
+        launcher:iconStart="@drawable/ic_slider_minus"
+        launcher:iconStartContentDescription="@string/font_size_make_smaller_desc"
+        launcher:iconEnd="@drawable/ic_slider_plus"
+        launcher:iconEndContentDescription="@string/font_size_make_larger_desc" />
+
     </androidx.preference.PreferenceCategory>
 </androidx.preference.PreferenceScreen>
