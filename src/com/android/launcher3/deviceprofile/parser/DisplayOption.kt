@@ -18,6 +18,9 @@ package com.android.launcher3.deviceprofile.parser
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.PointF
+import com.android.launcher3.InvariantDeviceProfile.KEY_FONT_SIZE
+import com.android.launcher3.InvariantDeviceProfile.KEY_ICON_SIZE
+import com.android.launcher3.LauncherPrefs
 import com.android.launcher3.R
 import com.android.launcher3.deviceprofile.parser.DeviceTypedMap.COUNT_SIZES
 import com.android.launcher3.deviceprofile.parser.DeviceTypedMap.INDEX_DEFAULT
@@ -28,6 +31,9 @@ import com.android.launcher3.display.LauncherDisplayInfo
 
 class DisplayOption
 private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedArray) {
+
+    private val iconSizeModifier = readSizePercent(context, KEY_ICON_SIZE) / 100f
+    private val fontSizeModifier = readSizePercent(context, KEY_FONT_SIZE) / 100f
 
     @JvmField val minWidthDps: Float = ta.getFloat(R.styleable.ProfileDisplayOption_minWidthDps, 0f)
     @JvmField
@@ -123,6 +129,7 @@ private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedA
             ) { i, v ->
                 getFloat(i, v)
             }
+            .map { it * iconSizeModifier }
             .toFloatArray()
 
     @JvmField
@@ -136,6 +143,7 @@ private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedA
             ) { i, v ->
                 getFloat(i, v)
             }
+            .map { it * fontSizeModifier }
             .toFloatArray()
 
     @JvmField
@@ -260,6 +268,20 @@ private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedA
     }
 
     companion object {
+        /**
+         * Reads a user size override as a percentage.
+         *
+         * Grids are parsed during direct boot (TaskbarManager builds an InvariantDeviceProfile
+         * before user 0 is unlocked), where credential-encrypted preferences are unreadable. Fall
+         * back to 100% in that case rather than taking down SystemUI's launcher process.
+         */
+        private fun readSizePercent(context: Context, key: String): Int =
+            try {
+                LauncherPrefs.getPrefs(context).getInt(key, 100)
+            } catch (ignored: IllegalStateException) {
+                100
+            }
+
 
         @JvmStatic
         fun getPredefinedDisplayOptions(

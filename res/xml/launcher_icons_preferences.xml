@@ -16,13 +16,34 @@
 -->
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res-auto"
-    xmlns:settings="http://schemas.android.com/apk/res/com.android.launcher3">
+    xmlns:launcher="http://schemas.android.com/apk/res-auto">
 
     <com.android.launcher3.settings.NotificationDotsPreference
         android:key="pref_icon_badging"
         android:title="@string/notification_dots_title"
         android:persistent="false"
         android:widgetLayout="@layout/notification_pref_warning" />
+
+    <com.android.settingslib.widget.SliderPreference
+        android:key="pref_custom_icon_size"
+        android:title="@string/icon_size_title"
+        android:max="150"
+        android:defaultValue="100"
+        launcher:min="50"
+        launcher:seekBarIncrement="1"
+        launcher:showSeekBarValue="true"
+        launcher:iconStart="@drawable/ic_remove_24dp"
+        launcher:iconEnd="@drawable/ic_add_24dp" />
+
+    <com.android.settingslib.widget.SliderPreference
+        android:key="pref_custom_font_size"
+        android:title="@string/font_size_title"
+        android:max="150"
+        android:defaultValue="100"
+        launcher:min="50"
+        launcher:seekBarIncrement="1"
+        launcher:showSeekBarValue="true"
+        launcher:iconStart="@drawable/ic_remove_24dp"
+        launcher:iconEnd="@drawable/ic_add_24dp" />
 
 </androidx.preference.PreferenceScreen>

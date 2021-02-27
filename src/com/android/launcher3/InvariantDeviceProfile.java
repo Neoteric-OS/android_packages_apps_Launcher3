@@ -116,6 +116,8 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
     public static final String KEY_SHOW_DESKTOP_LABELS = "pref_desktop_show_labels";
     public static final String KEY_SHOW_DRAWER_LABELS = "pref_drawer_show_labels";
     public static final String KEY_WORKSPACE_LOCK = "pref_workspace_lock";
+    public static final String KEY_ICON_SIZE = "pref_custom_icon_size";
+    public static final String KEY_FONT_SIZE = "pref_custom_font_size";
 
     // Constants that affects the interpolation curve between statically defined device profile
     // buckets.
@@ -323,12 +325,20 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
                 mMainExecutor, i -> onConfigChanged());
         localeReceiver.register(actionsFilter(Intent.ACTION_LOCALE_CHANGED));
         lifeCycle.addCloseable(localeReceiver);
+
+        // Grids can be parsed during direct boot, before the user's credential encrypted
+        // preferences (icon/font size overrides) are readable. Re-parse once they unlock.
+        SimpleBroadcastReceiver userUnlockedReceiver = new SimpleBroadcastReceiver(context,
+                mMainExecutor, i -> onConfigChanged());
+        userUnlockedReceiver.register(actionsFilter(Intent.ACTION_USER_UNLOCKED));
+        lifeCycle.addCloseable(userUnlockedReceiver);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
         if (KEY_ALLAPPS_THEMED_ICONS.equals(key) || KEY_SHOW_DESKTOP_LABELS.equals(key)
-                || KEY_SHOW_DRAWER_LABELS.equals(key)) {
+                || KEY_SHOW_DRAWER_LABELS.equals(key) || KEY_ICON_SIZE.equals(key)
+                || KEY_FONT_SIZE.equals(key)) {
             onConfigChanged();
         }
     }

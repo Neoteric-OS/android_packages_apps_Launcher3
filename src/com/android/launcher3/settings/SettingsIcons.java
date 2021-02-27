@@ -38,6 +38,7 @@ import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.launcher3.BuildConfig;
+import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.LauncherPrefs;
@@ -46,6 +47,7 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.model.WidgetsModel;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
+import com.android.settingslib.widget.SliderPreference;
 
 public class SettingsIcons extends CollapsingToolbarBaseActivity
         implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback,
@@ -229,6 +231,11 @@ public class SettingsIcons extends CollapsingToolbarBaseActivity
             switch (preference.getKey()) {
                 case NOTIFICATION_DOTS_PREFERENCE_KEY:
                     return BuildConfig.NOTIFICATION_DOTS_ENABLED;
+                case InvariantDeviceProfile.KEY_ICON_SIZE:
+                case InvariantDeviceProfile.KEY_FONT_SIZE:
+                    ((SliderPreference) preference).setLabelFormater(
+                            value -> getString(R.string.size_percentage, (int) value));
+                    return true;
             }
 
             return true;
