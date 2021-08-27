@@ -115,4 +115,8 @@
     <string name="pref_allow_phone_taskbar">Use taskbar</string>
     <string name="pref_allow_phone_taskbar_desc">For opening and switching apps anywhere</string>
 
+    <!-- Lock -->
+    <string name="action_lock">Lock/Unlock app</string>
+    <string name="unlock_app">Unlocked app in recents</string>
+    <string name="lock_app">Locked app in recents</string>
 </resources>

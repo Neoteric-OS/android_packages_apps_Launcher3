@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.app.ActivityManagerNative;
 import android.app.ActivityOptions;
 import android.app.IActivityManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -33,6 +34,7 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.os.SystemProperties;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowInsets;
@@ -63,6 +65,8 @@ import com.android.systemui.shared.recents.view.AppTransitionAnimationSpecsFutur
 import com.android.systemui.shared.recents.view.RecentsTransition;
 import com.android.systemui.shared.system.ActivityManagerWrapper;
 
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -299,6 +303,21 @@ public interface TaskShortcutFactory {
                             taskContainer.getItemInfo(), taskContainer.getTaskView()));
         }
     };
+    
+    TaskShortcutFactory LOCK_APP = new TaskShortcutFactory() {
+        @Override
+        public List<SystemShortcut> getShortcuts(BaseDraggingActivity activity,
+                TaskIdAttributeContainer taskContainer) {
+            String packageName = taskContainer.getTaskView()
+                    .getItemInfo().getTargetComponent().getPackageName();
+            Context context = taskContainer.getTaskView().getContext();
+            if (ENABLE_OVERVIEW_SELECTIONS.get()) {
+                return createSingletonShortcutList(new LockAppSystemShortcut(
+                        context, activity, taskContainer, packageName));
+            }
+            return null;
+        }
+    };
 
     TaskShortcutFactory FREE_FORM = new TaskShortcutFactory() {
         @Override
@@ -460,6 +479,57 @@ public interface TaskShortcutFactory {
                 }
             }
             dismissTaskMenuView(mActivity);
+        }
+    }
+    
+    class LockAppSystemShortcut extends SystemShortcut {
+        private static final String TAG = "LockAppSystemShortcut";
+        private final TaskView mTaskView;
+        private final BaseDraggingActivity mActivity;
+        private final String mPackageName;
+        List<String> mLockedTasks = new ArrayList<>();
+        private String mStartPkg, mEndPkg;
+        private Context mContext;
+
+        public LockAppSystemShortcut(Context context, BaseDraggingActivity activity, TaskIdAttributeContainer taskContainer, String packageName) {
+            super(R.drawable.recents_locked, R.string.action_lock,
+                    activity, taskContainer.getItemInfo(), taskContainer.getTaskView());
+            mTaskView = taskContainer.getTaskView();
+            mActivity = activity;
+            mPackageName = packageName;
+            mContext = context;
+            
+            String lockedTasks = Settings.System.getStringForUser(
+                    mContext.getContentResolver(),
+                    Settings.System.RECENTS_LOCKED_TASKS,
+                    UserHandle.USER_CURRENT);
+
+            if (mLockedTasks.size() == 0 && lockedTasks != null && !lockedTasks.isEmpty()) {
+            mLockedTasks = new ArrayList<String>(Arrays.asList(lockedTasks.split(",")));
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (mPackageName != null) {
+                Task task = mTaskView.getTask();
+                if (task != null) {
+                    if (mLockedTasks.contains(mPackageName)) {
+                        mLockedTasks.remove(mPackageName);
+                        Toast unlockApp = Toast.makeText(mActivity, R.string.unlock_app,
+                            Toast.LENGTH_SHORT);
+                        unlockApp.show();
+                    } else {
+                        mLockedTasks.add(mPackageName);
+                        Toast lockApp = Toast.makeText(mActivity, R.string.lock_app,
+                            Toast.LENGTH_SHORT);
+                        lockApp.show();
+                    }
+                }
+            }
+           Settings.System.putStringForUser(mContext.getContentResolver(),
+           Settings.System.RECENTS_LOCKED_TASKS, String.join(",", mLockedTasks),
+                UserHandle.USER_CURRENT);
         }
     }
 }
