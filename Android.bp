@@ -279,6 +279,9 @@ java_library {
 // Library with all the dependencies for building Launcher3
 android_library {
     name: "Launcher3ResLib",
+    defaults: [
+        "SettingsLibDefaults",
+    ],
     srcs: [],
     resource_dirs: ["res"],
     static_libs: [
