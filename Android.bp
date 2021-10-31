@@ -279,6 +279,9 @@ java_library {
 // Library with all the dependencies for building Launcher3
 android_library {
     name: "Launcher3ResLib",
+    defaults: [
+        "SettingsLibDefaults",
+    ],
     srcs: [],
     resource_dirs: ["res"],
     static_libs: [
@@ -326,6 +329,7 @@ android_library {
         "androidx.compose.ui_ui-tooling",
         "androidx.navigation_navigation-compose",
         "cuebarlib",
+        "SettingsLib",
     ],
     manifest: "AndroidManifest-common.xml",
     sdk_version: "current",
