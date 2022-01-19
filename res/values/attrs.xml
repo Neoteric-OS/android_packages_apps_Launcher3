@@ -28,6 +28,7 @@
     <attr name="privateSpaceSettingsColor" format="color" />
     <attr name="privateSpaceDividerColor" format="color" />
     <attr name="bottomSheetDragHandleColor" format="color" />
+    <attr name="allAppsSearchTextColor" format="color"/>
     <attr name="allAppsTheme" format="reference" />
     <attr name="popupColorPrimary" format="color" />
     <attr name="popupColorSecondary" format="color" />
