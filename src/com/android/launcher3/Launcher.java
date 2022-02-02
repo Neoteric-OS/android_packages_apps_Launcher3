@@ -431,7 +431,15 @@ public class Launcher extends StatefulActivity<LauncherState>
     private final OnSharedPreferenceChangeListener mSharedPrefListener =
             new OnSharedPreferenceChangeListener() {
                 @Override
-                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {}
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    switch (key) {
+                        case Utilities.KEY_DOCK_SEARCH:
+                            mNeedsRestart = true;
+                            break;
+                        default:
+                            break;
+                    }
+                }
             };
 
     public static Launcher getLauncher(Context context) {
