@@ -37,6 +37,7 @@ import com.android.launcher3.icons.IconCache;
 import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.model.AllAppsList;
 import com.android.launcher3.model.BgDataModel;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.model.ModelTaskController;
 import com.android.launcher3.model.data.AppInfo;
 import com.android.launcher3.model.data.ItemInfo;
@@ -85,6 +86,9 @@ public class PackageUpdatedTask implements ModelUpdateTask {
             @NonNull AllAppsList appsList) {
         final Context context = taskController.getContext();
         final IconCache iconCache = taskController.getIconCache();
+        // The -1 feed integration depends on the Google app, so pick up its install/update/removal.
+        // Captured up front: disabled packages get removed from mPackages below.
+        final boolean needsRestart = mPackages.contains(Utilities.GSA_PACKAGE);
 
         if (mIsUpdate) {
             // Mark disabled packages in the broadcast to be removed
@@ -226,6 +230,10 @@ public class PackageUpdatedTask implements ModelUpdateTask {
                 dataModel.widgetsModel.update(new PackageUserKey(packageName, mUser));
             }
             taskController.bindUpdatedWidgets(dataModel);
+        }
+
+        if (needsRestart) {
+            Utilities.restart(context);
         }
     }
 }
