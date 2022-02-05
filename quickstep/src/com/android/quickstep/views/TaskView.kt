@@ -190,7 +190,8 @@ constructor(
     val itemInfo: TaskViewItemInfo
         get() = TaskViewItemInfo(this, firstTaskContainer)
 
-    protected val container: RecentsViewContainer =
+    protected val 
+container: RecentsViewContainer =
         RecentsViewContainer.containerFromContext(context)
     protected val lastTouchDownPosition = PointF()
 
@@ -1768,6 +1769,10 @@ constructor(
     fun getSizeAdjustment(fullscreenEnabled: Boolean) = if (fullscreenEnabled) nonGridScale else 1f
 
     private fun applyScale() {
+        /* This is now only for grid mode on tablets. Unconditionally calling this breaks
+         * our overview scrolling animation. Block this method, otherwise we have to
+         * introduce a multivalue scale fusion class to handle this. */
+        if (!container.deviceProfile.isTablet) return
         val scale = persistentScale * dismissScale * Utilities.mapRange(modalness, 1f, modalScale)
         scaleX = scale
         scaleY = scale
