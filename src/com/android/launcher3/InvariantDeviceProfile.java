@@ -332,8 +332,15 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-        if (KEY_SHOW_DESKTOP_LABELS.equals(key) || KEY_SHOW_DRAWER_LABELS.equals(key) || KEY_ALLAPPS_THEMED_ICONS.equals(key) || IconDatabase.KEY_ICON_PACK.equals(key) || KEY_ICON_SIZE.equals(key) || KEY_FONT_SIZE.equals(key)) {
-            onConfigChanged(mContext);
+        switch (key) {
+            case KEY_SHOW_DESKTOP_LABELS:
+            case KEY_SHOW_DRAWER_LABELS:
+            case KEY_ICON_SIZE:
+            case KEY_FONT_SIZE:
+            case IconDatabase.KEY_ICON_PACK:
+            case KEY_ALLAPPS_THEMED_ICONS:
+                onConfigChanged(mContext);
+                break;
         }
     }
 
