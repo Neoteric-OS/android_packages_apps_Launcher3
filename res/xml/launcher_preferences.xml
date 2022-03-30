@@ -43,4 +43,16 @@
 
     </androidx.preference.PreferenceCategory>
 
+    <androidx.preference.PreferenceCategory
+        android:key="allapps_category"
+        android:title="@string/category_allapps">
+
+        <SwitchPreferenceCompat
+            android:key="pref_allapps_themed_icons"
+            android:title="@string/pref_themed_icons_title"
+            android:summary="@string/pref_themed_icons_summary"
+            android:defaultValue="false"
+            android:persistent="true" />
+    </androidx.preference.PreferenceCategory>
+
 </androidx.preference.PreferenceScreen>
