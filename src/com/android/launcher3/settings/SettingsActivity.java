@@ -25,8 +25,6 @@ import static com.android.launcher3.Utilities.KEY_SMARTSPACE;
 
 import static org.zeph.launcher.OverlayCallbackImpl.KEY_ENABLE_MINUS_ONE;
 
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -60,8 +58,6 @@ import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
-import com.android.launcher3.customization.IconDatabase;
-import com.android.launcher3.icons.pack.IconPackSettingsActivity;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.lineage.trust.TrustAppsActivity;
 import com.android.launcher3.model.WidgetsModel;
@@ -72,6 +68,11 @@ import com.android.launcher3.util.DisplayController;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
 
+import com.android.launcher3.customization.IconDatabase;
+import com.android.launcher3.settings.preference.IconPackPrefSetter;
+import com.android.launcher3.settings.preference.ReloadingListPreference;
+import com.android.launcher3.util.AppReloader;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -80,7 +81,7 @@ import java.util.List;
  */
 public class SettingsActivity extends CollapsingToolbarBaseActivity
         implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     /** List of fragments that can be hosted by this activity. */
     private static final List<String> VALID_PREFERENCE_FRAGMENTS = Collections.singletonList(
@@ -97,6 +98,8 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
     public static final String SAVE_HIGHLIGHTED_KEY = "android:preference_highlighted";
 
     private static final String KEY_SUGGESTIONS = "pref_suggestions";
+
+    private static final String KEY_ICON_PACK = "pref_icon_pack";
 
     @VisibleForTesting
     static final String EXTRA_FRAGMENT = ":settings:fragment";
@@ -223,7 +226,7 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
         private boolean mPreferenceHighlighted = false;
         private Preference mDeveloperOptionPref;
         private PreferenceGroup mDeveloperOptionPrefGroup;
-        private Preference mIconPackPref;
+	private ReloadingListPreference mIconPackPref;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -240,10 +243,6 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
             getPreferenceManager().setSharedPreferencesName(LauncherFiles.SHARED_PREFERENCES_KEY);
             setPreferencesFromResource(R.xml.launcher_preferences, rootKey);
 
-            updatePreferences();
-        }
-
-        public void updatePreferences() {
             PreferenceScreen screen = getPreferenceScreen();
             for (int i = screen.getPreferenceCount() - 1; i >= 0; i--) {
                 Preference preference = screen.getPreference(i);
@@ -346,16 +345,18 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
                 case KEY_SUGGESTIONS:
                     preference.setEnabled(isAsiEnabled());
                     return true;
-
-		case IconDatabase.KEY_ICON_PACK:
-                    mIconPackPref = preference;
-                    preference.setOnPreferenceClickListener(p -> {
-                        startActivity(new Intent(getActivity(), IconPackSettingsActivity.class));
+                case KEY_ICON_PACK:
+                    mIconPackPref = (ReloadingListPreference) preference;
+                    mIconPackPref.setValue(IconDatabase.getGlobal(getActivity()));
+                    mIconPackPref.setOnReloadListener(IconPackPrefSetter::new);
+                    mIconPackPref.setIcon(getPackageIcon(IconDatabase.getGlobal(getActivity())));
+                    mIconPackPref.setOnPreferenceChangeListener((pref, val) -> {
+                        IconDatabase.clearAll(getActivity());
+                        IconDatabase.setGlobal(getActivity(), (String) val);
+                        mIconPackPref.setIcon(getPackageIcon((String) val));
+                        AppReloader.get(getActivity()).reload();
                         return true;
                     });
-                    updateIconPackOption();
-                    return true;
-
                 case KEY_TRUST_APPS:
                         Preference hiddenApps = (Preference) findPreference(KEY_TRUST_APPS);
                         hiddenApps.setOnPreferenceClickListener(p -> {
@@ -393,10 +394,6 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
             return showPreference;
         }
 
-        private void updateIconPackOption() {
-            mIconPackPref.setSummary(IconDatabase.getGlobalLabel(getActivity()));
-        }
-
         private boolean isGsaEnabled() {
             return Utilities.isGSAEnabled(getContext());
         }
@@ -410,8 +407,6 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
             super.onResume();
 
             updateDeveloperOption();
-
-            updateIconPackOption();
 
             if (isAdded() && !mPreferenceHighlighted) {
                 PreferenceHighlighter highlighter = createHighlighter();
@@ -455,6 +450,16 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
                             .performAccessibilityAction(ACTION_ACCESSIBILITY_FOCUS, null);
                 }
             });
+        }
+
+        private Drawable getPackageIcon(String pkgName) {
+            Drawable icon = getContext().getResources().
+                              getDrawable(com.android.internal.R.drawable.sym_def_app_icon);
+            try {
+                 icon = getContext().getPackageManager().
+                              getApplicationIcon(pkgName);
+            } catch (PackageManager.NameNotFoundException e) {  }
+            return icon;
         }
     }
 
