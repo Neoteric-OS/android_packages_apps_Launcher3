@@ -394,6 +394,7 @@ public class Launcher extends StatefulActivity<LauncherState>
     private LauncherState mPrevLauncherState;
 
     private StringCache mStringCache;
+    private boolean mPendingRestart;
 
     private boolean mSmartspaceEnabled;
 
@@ -620,7 +621,10 @@ public class Launcher extends StatefulActivity<LauncherState>
     }
 
     @Override
-    public void onIdpChanged(boolean modelPropertiesChanged) {
+    public void onIdpChanged(boolean modelPropertiesChanged, boolean taskbarChanged) {
+        if (taskbarChanged) {
+            mPendingRestart = true;
+        }
         onHandleConfigurationChanged();
     }
 
@@ -1193,6 +1197,10 @@ public class Launcher extends StatefulActivity<LauncherState>
         AbstractFloatingView.closeAllOpenViewsExcept(this, false, TYPE_REBIND_SAFE);
         DragView.removeAllViews(this);
         TraceHelper.INSTANCE.endSection(traceToken);
+
+        if (mPendingRestart) {
+            System.exit(0);
+        }
     }
 
     @Override
