@@ -401,6 +401,12 @@ class SystemUiProxy @Inject constructor(@ApplicationContext private val context:
             systemUiProxy?.notifyPrioritizedRotation(rotation)
         }
 
+    fun setTaskbarEnabled(enabled: Boolean) {
+        executeWithErrorLog({ "Failed call setTaskbarEnabled with arg: $enabled" }) {
+            systemUiProxy?.setTaskbarEnabled(enabled)
+        }
+    }
+
     fun notifyTaskbarStatus(visible: Boolean, stashed: Boolean) =
         executeWithErrorLog({ "Failed call notifyTaskbarStatus with arg: $visible, $stashed" }) {
             systemUiProxy?.notifyTaskbarStatus(visible, stashed)

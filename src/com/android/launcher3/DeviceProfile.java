@@ -41,6 +41,7 @@ import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -422,7 +423,10 @@ public class DeviceProfile {
         isTwoPanels = isTablet && isMultiDisplay;
         boolean taskbarOrBubbleBarOnPhones = enableTinyTaskbar()
                 || (enableBubbleBar() && enableBubbleBarOnPhones());
-        isTaskbarPresent = (isTablet || (taskbarOrBubbleBarOnPhones && isGestureMode))
+        boolean isTaskBarEnabled = Settings.System.getInt(context.getContentResolver(),
+                Settings.System.ENABLE_TASKBAR, (isTablet || (taskbarOrBubbleBarOnPhones
+                && isGestureMode)) ? 1 : 0) == 1;
+        isTaskbarPresent = isTaskBarEnabled
                 && wmProxy.isTaskbarDrawnInProcess();
 
         // Some more constants.
