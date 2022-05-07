@@ -84,4 +84,8 @@
     <!-- Wallpaper scrolling -->
     <string name="allow_wallpaper_scrolling">Wallpaper scrolling</string>
     <string name="allow_wallpaper_scrolling_summary">Wallpaper scrolling effect for multiple screens</string>
+
+    <!-- Top shadow -->
+    <string name="show_top_shadow_title">Show top shadow</string>
+    <string name="show_top_shadow_summary">Add shadow underneath the status bar</string>
 </resources>
