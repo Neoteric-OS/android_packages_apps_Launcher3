@@ -1,27 +1,34 @@
 package com.android.launcher3.qsb;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import androidx.core.view.ViewCompat;
 import com.android.launcher3.R;
 import com.android.launcher3.Reorderable;
 import com.android.launcher3.Utilities;
+import com.android.launcher3.graphics.ThemeManager;
 import com.android.launcher3.qsb.QsbContainerView;
 import com.android.launcher3.util.MultiTranslateDelegate;
-import android.view.View;
+import com.android.launcher3.LauncherPrefs;
 
-public class QsbLayout extends FrameLayout implements Reorderable {
+public class QsbLayout extends FrameLayout implements Reorderable,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
-    ImageButton lensIcon;
-    AssistantIconView assistantIcon;
+    ImageView mAssistantIcon;
+    ImageView mGoogleIcon;
+    ImageView mLensIcon;
     Context mContext;
+    ThemeManager mThemeManager;
 
     private final MultiTranslateDelegate mTranslateDelegate = new MultiTranslateDelegate(this);
     private float mScaleForReorderBounce = 1f;
@@ -29,24 +36,33 @@ public class QsbLayout extends FrameLayout implements Reorderable {
     public QsbLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        mThemeManager = ThemeManager.INSTANCE.get(context);
     }
 
     public QsbLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mContext = context;
+        mThemeManager = ThemeManager.INSTANCE.get(context);
     }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        assistantIcon = findViewById(R.id.mic_icon);
-        assistantIcon.setIcon();
+        mAssistantIcon = findViewById(R.id.mic_icon);
+        mGoogleIcon = findViewById(R.id.g_icon);
+        mLensIcon = findViewById(R.id.lens_icon);
+        setIcons();
+
+        LauncherPrefs.getPrefs(mContext).registerOnSharedPreferenceChangeListener(this);
+
         String searchPackage = QsbContainerView.getSearchWidgetPackageName(mContext);
         setOnClickListener(view -> {
             mContext.startActivity(new Intent("android.search.action.GLOBAL_SEARCH").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_CLEAR_TASK).setPackage(searchPackage));
         });
+
         if (Utilities.isGSAEnabled(mContext)) {
-            setupLensIcon();
+            enableLensIcon();
         }
     }
 
@@ -65,11 +81,28 @@ public class QsbLayout extends FrameLayout implements Reorderable {
         }
     }
 
-    private void setupLensIcon() {
-        lensIcon = findViewById(R.id.lens_icon);
-        lensIcon.setVisibility(View.VISIBLE);
-        lensIcon.setImageResource(R.drawable.ic_lens_color);
-        lensIcon.setOnClickListener(view -> {
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (key.equals(ThemeManager.KEY_THEMED_ICONS)) {
+            setIcons();
+        }
+    }
+
+    private void setIcons() {
+        if (mThemeManager.isMonoThemeEnabled()) {
+            mAssistantIcon.setImageResource(R.drawable.ic_mic_themed);
+            mGoogleIcon.setImageResource(R.drawable.ic_super_g_themed);
+            mLensIcon.setImageResource(R.drawable.ic_lens_themed);
+        } else {
+            mAssistantIcon.setImageResource(R.drawable.ic_mic_color);
+            mGoogleIcon.setImageResource(R.drawable.ic_super_g_color);
+            mLensIcon.setImageResource(R.drawable.ic_lens_color);
+        }
+    }
+
+    private void enableLensIcon() {
+        mLensIcon.setVisibility(View.VISIBLE);
+        mLensIcon.setOnClickListener(view -> {
             Intent lensIntent = new Intent();
             Bundle bundle = new Bundle();
             bundle.putString("caller_package", Utilities.GSA_PACKAGE);
