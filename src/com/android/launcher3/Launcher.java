@@ -292,6 +292,8 @@ public class Launcher extends StatefulActivity<LauncherState>
 
     private static final int ON_ACTIVITY_RESULT_ANIMATION_DELAY = 500;
 
+    private static final String KEY_DARK_STATUS_BAR = "pref_dark_status_bar";
+
     // How long to wait before the new-shortcut animation automatically pans the workspace
     @VisibleForTesting public static final int NEW_APPS_PAGE_MOVE_DELAY = 500;
     private static final int NEW_APPS_ANIMATION_INACTIVE_TIMEOUT_SECONDS = 5;
@@ -409,6 +411,8 @@ public class Launcher extends StatefulActivity<LauncherState>
                             || Utilities.KEY_SHORT_PARALLAX.equals(key)
                             || Utilities.KEY_SINGLE_PAGE_CENTER.equals(key)) {
                         mNeedsRestart = true;
+                    } else if (KEY_DARK_STATUS_BAR.equals(key)) {
+                        recreate();
                     }
                 }
             };
@@ -513,7 +517,9 @@ public class Launcher extends StatefulActivity<LauncherState>
         // Listen for screen turning off
         ScreenOnTracker.INSTANCE.get(this).addListener(mScreenOnListener);
         getSystemUiController().updateUiState(SystemUiController.UI_STATE_BASE_WINDOW,
-                Themes.getAttrBoolean(this, R.attr.isWorkspaceDarkText));
+                Themes.getAttrBoolean(this, R.attr.isWorkspaceDarkText)
+                || mSharedPrefs.getBoolean(KEY_DARK_STATUS_BAR, false));
+
 
         mOverlayManager = getDefaultOverlay();
 
