@@ -53,6 +53,7 @@ import androidx.preference.PreferenceGroup.PreferencePositionCallback;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Flags;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherAppState;
@@ -131,7 +132,6 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
             fm.beginTransaction().replace(
                     com.android.settingslib.collapsingtoolbar.R.id.content_frame, f).commit();
         }
-        LauncherPrefs.getPrefs(getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
     }
 
     /**

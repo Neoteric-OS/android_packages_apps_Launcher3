@@ -35,6 +35,7 @@ import static com.android.wm.shell.Flags.enableTinyTaskbar;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -65,6 +66,7 @@ import com.android.launcher3.responsive.ResponsiveCellSpecsProvider;
 import com.android.launcher3.responsive.ResponsiveSpec.Companion.ResponsiveSpecType;
 import com.android.launcher3.responsive.ResponsiveSpec.DimensionType;
 import com.android.launcher3.responsive.ResponsiveSpecsProvider;
+import com.android.launcher3.util.ApiWrapper;
 import com.android.launcher3.util.CellContentDimensions;
 import com.android.launcher3.util.DisplayController;
 import com.android.launcher3.util.DisplayController.Info;
@@ -79,6 +81,8 @@ import java.util.function.Consumer;
 
 @SuppressLint("NewApi")
 public class DeviceProfile {
+
+    public static final String KEY_PHONE_TASKBAR = "pref_allow_phone_taskbar";
 
     private static final int DEFAULT_DOT_SIZE = 100;
     private static final float MIN_FOLDER_TEXT_SIZE_SP = 16f;
@@ -415,19 +419,16 @@ public class DeviceProfile {
                 && inv.workspaceCellSpecsId != INVALID_RESOURCE_HANDLE
                 && inv.allAppsCellSpecsId != INVALID_RESOURCE_HANDLE;
 
+	SharedPreferences prefs = LauncherPrefs.getPrefs(context);
+
         mIsScalableGrid = inv.isScalable && !isVerticalBarLayout() && !isMultiWindowMode;
         // Determine device posture.
         mInfo = info;
         isTablet = info.isTablet(windowBounds);
         isPhone = !isTablet;
         isTwoPanels = isTablet && isMultiDisplay;
-        boolean taskbarOrBubbleBarOnPhones = enableTinyTaskbar()
-                || (enableBubbleBar() && enableBubbleBarOnPhones());
-        boolean isTaskBarEnabled = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.ENABLE_TASKBAR, (isTablet || (taskbarOrBubbleBarOnPhones
-                && isGestureMode)) ? 1 : 0) == 1;
-        isTaskbarPresent = isTaskBarEnabled
-                && wmProxy.isTaskbarDrawnInProcess();
+        boolean allowTaskbar = prefs.getBoolean(KEY_PHONE_TASKBAR, isTablet);
+        isTaskbarPresent = allowTaskbar && wmProxy.isTaskbarDrawnInProcess();
 
         // Some more constants.
         context = getContext(context, info, inv.isFixedLandscape
