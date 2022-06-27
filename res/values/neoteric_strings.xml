@@ -76,4 +76,8 @@
     <string name="font_size_title">Font size</string>
     <!-- Slider value for the icon and font size preferences, e.g. 100% -->
     <string name="size_percentage"><xliff:g id="percentage" example="100">%1$d</xliff:g>%%</string>
+
+    <!-- Wallpaper scrolling -->
+    <string name="allow_wallpaper_scrolling">Wallpaper scrolling</string>
+    <string name="allow_wallpaper_scrolling_summary">Wallpaper scrolling effect for multiple screens</string>
 </resources>
