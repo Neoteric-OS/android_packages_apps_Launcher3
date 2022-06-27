@@ -40,9 +40,15 @@
         android:summaryOn="@string/settings_lock_layout_summary_on"
         android:summaryOff="@string/settings_lock_layout_summary_off" />
         
-     <Preference
+    <Preference
         android:key="pref_trust_apps"
         android:title="@string/trust_apps_manager_name" />
+
+    <SwitchPreference
+            android:key="pref_allow_wallpaper_scrolling"
+            android:title="@string/allow_wallpaper_scrolling"
+            android:summary="@string/allow_wallpaper_scrolling_summary"
+            android:defaultValue="true" />
 
     <SwitchPreference
         android:key="pref_dt_gesture"
