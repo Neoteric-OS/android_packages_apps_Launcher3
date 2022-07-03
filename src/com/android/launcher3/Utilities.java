@@ -175,6 +175,7 @@ public final class Utilities {
     public static final String KEY_DOCK_SEARCH = "pref_dock_search";
     public static final String KEY_SMARTSPACE = "pref_smartspace";
     public static final String KEY_ICON_PACK = "pref_icon_pack";
+    public static final String KEY_ALLOW_WALLPAPER_ZOOMING = "pref_allow_wallpaper_zooming";
     /**
      * Returns true if theme is dark.
      */
@@ -910,6 +911,11 @@ public final class Utilities {
     public static boolean hasSecureKeyguard(Context context) {
         final KeyguardManager keyguardManager = context.getSystemService(KeyguardManager.class);
         return keyguardManager != null && keyguardManager.isKeyguardSecure();
+    }
+
+    public static boolean canZoomWallpaper(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_ALLOW_WALLPAPER_ZOOMING, true);
     }
 
     /**
