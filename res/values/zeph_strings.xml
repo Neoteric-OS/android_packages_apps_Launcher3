@@ -55,9 +55,6 @@
     <string name="category_misc">Misc</string>
     <string name="category_google">Google</string>
 
-    <!-- Recents -->
-    <string name="action_lens">Lens</string>
-
     <!-- Hotseat searchbar -->
     <string name="label_search">Search</string>
     <string name="label_lens">Google Lens</string>
@@ -119,4 +116,10 @@
     <string name="action_lock">Lock/Unlock app</string>
     <string name="unlock_app">Unlocked app in recents</string>
     <string name="lock_app">Locked app in recents</string>
+
+    <!-- Recents icons -->
+    <string name="actions_category_title">Quick actions</string>
+    <string name="recents_screenshot_title">Screenshot</string>
+    <string name="recents_clear_all_title">Clear all</string>
+    <string name="recents_lens_title">Lens</string>
 </resources>
