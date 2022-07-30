@@ -17,7 +17,7 @@
 package com.android.launcher3.dagger
 
 import com.android.launcher3.model.ModelDelegate
-import com.android.launcher3.model.QuickstepModelDelegate
+import com.android.launcher3.CustomLauncherModelDelegate
 import dagger.Binds
 import dagger.Module
 
@@ -28,5 +28,5 @@ import dagger.Module
 @Module
 abstract class AppModule {
 
-    @Binds abstract fun bindModelDelegate(impl: QuickstepModelDelegate): ModelDelegate
+    @Binds abstract fun bindModelDelegate(impl: CustomLauncherModelDelegate): ModelDelegate
 }
