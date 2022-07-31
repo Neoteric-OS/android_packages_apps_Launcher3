@@ -447,6 +447,7 @@ public class Launcher extends StatefulActivity<LauncherState>
                         case Utilities.KEY_SINGLE_PAGE_CENTER:
                         case Utilities.KEY_DRAWER_SCROLLBAR:
                         case DeviceProfile.KEY_PHONE_TASKBAR:
+                        case Utilities.KEY_SMARTSPACE:
                             mNeedsRestart = true;
                             break;
                         default:

@@ -44,6 +44,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.launcher3.BuildConfig;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.dagger.LauncherAppSingleton;
@@ -148,14 +149,14 @@ public class BgDataModel {
     /**
      * Creates an array of valid workspace screens based on current items in the model.
      */
-    public synchronized IntArray collectWorkspaceScreens() {
+    public synchronized IntArray collectWorkspaceScreens(Context context) {
         IntSet screenSet = new IntSet();
         for (ItemInfo item: itemsIdMap) {
             if (item.container == CONTAINER_DESKTOP) {
                 screenSet.add(item.screenId);
             }
         }
-        if ((FeatureFlags.QSB_ON_FIRST_SCREEN
+        if ((Utilities.showSmartspace(context)
                 && !SHOULD_SHOW_FIRST_PAGE_WIDGET)
                 || screenSet.isEmpty()) {
             screenSet.add(Workspace.FIRST_SCREEN_ID);

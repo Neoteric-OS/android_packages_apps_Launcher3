@@ -15,6 +15,8 @@
  */
 package com.android.launcher3.model;
 
+import android.content.Context;
+
 import static com.android.launcher3.Utilities.SHOULD_SHOW_FIRST_PAGE_WIDGET;
 import static com.android.launcher3.WorkspaceLayoutManager.FIRST_SCREEN_ID;
 
@@ -23,7 +25,9 @@ import android.util.LongSparseArray;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherModel;
 import com.android.launcher3.LauncherSettings;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.config.FeatureFlags;
+import com.android.launcher3.dagger.ApplicationContext;
 import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.util.GridOccupancy;
 import com.android.launcher3.util.IntArray;
@@ -42,9 +46,12 @@ public class WorkspaceItemSpaceFinder {
     private InvariantDeviceProfile mIDP;
     private LauncherModel mModel;
 
+    private final Context mContext;
+
     @Inject
-    WorkspaceItemSpaceFinder(
+    WorkspaceItemSpaceFinder(@ApplicationContext Context context,
             BgDataModel dataModel, InvariantDeviceProfile idp, LauncherModel model) {
+        mContext = context;
         mDataModel = dataModel;
         mIDP = idp;
         mModel = model;
@@ -81,7 +88,7 @@ public class WorkspaceItemSpaceFinder {
         int screenCount = workspaceScreens.size();
         // First check the preferred screen.
         IntSet screensToExclude = new IntSet();
-        if (FeatureFlags.QSB_ON_FIRST_SCREEN
+        if (Utilities.showSmartspace(mContext)
                 && !SHOULD_SHOW_FIRST_PAGE_WIDGET) {
             screensToExclude.add(FIRST_SCREEN_ID);
         }
