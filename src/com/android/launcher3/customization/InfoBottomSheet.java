@@ -20,6 +20,8 @@ import android.widget.TextView;
 import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.Insettable;
 import com.android.launcher3.Launcher;
+import com.android.launcher3.QuickstepTransitionManager;
+import com.android.launcher3.uioverrides.QuickstepLauncher;
 import com.android.launcher3.R;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.views.AbstractSlideInView;
@@ -142,6 +144,18 @@ public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements In
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             mContext = getActivity();
+        }
+
+        /**
+         * The sheet only ever shows over the launcher, so it reuses the launcher's transition
+         * manager rather than building (and registering remote animations for) a second one.
+         */
+        private QuickstepTransitionManager getAppTransitionManager() {
+            return ((QuickstepLauncher) Launcher.getLauncher(mContext)).getAppTransitionManager();
+        }
+
+        public ActivityOptionsWrapper getActivityLaunchOptions(View v) {
+            return getAppTransitionManager().getActivityLaunchOptions(v, mItemInfo);
         }
 
         @Override
