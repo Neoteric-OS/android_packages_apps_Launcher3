@@ -100,6 +100,9 @@ android_library {
     name: "Launcher3ResLib",
     srcs: [ ],
     resource_dirs: ["res"],
+    defaults: [
+        "SettingsLibDefaults",
+    ],
     static_libs: [
         "LauncherPluginLib",
         "launcher_quickstep_log_protos_lite",
@@ -113,7 +116,6 @@ android_library {
         "com.google.android.material_material",
         "iconloader_base",
         "libGoogleFeed",
-        "SettingsLib",
         "monet",
         "bcsmartspace-google",
         "SystemUIPluginLib",
