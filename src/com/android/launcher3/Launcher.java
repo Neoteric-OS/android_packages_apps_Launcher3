@@ -404,7 +404,11 @@ public class Launcher extends StatefulActivity<LauncherState>
     private final OnSharedPreferenceChangeListener mSharedPrefListener =
             new OnSharedPreferenceChangeListener() {
                 @Override
-                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {}
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    if (Utilities.KEY_DRAWER_SEARCH.equals(key)) {
+                        mNeedsRestart = true;
+                    }
+                }
             };
 
     private InputMethodManager mInputMethodManager;

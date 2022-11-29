@@ -101,4 +101,8 @@
     <string name="teardrop_shape_title">Teardrop</string>
     <string name="rounded_rect_shape_title">Rounded rect</string>
 
+
+    <!-- App drawer searchbar -->
+    <string name="drawer_search_title">App search bar</string>
+    <string name="drawer_search_summary">Search bar on top of the app drawer</string>
 </resources>
