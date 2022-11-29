@@ -435,6 +435,7 @@ public class Launcher extends StatefulActivity<LauncherState>
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                     switch (key) {
                         case Utilities.KEY_DOCK_SEARCH:
+                        case Utilities.KEY_DRAWER_SEARCH:
                             mNeedsRestart = true;
                             break;
                         default:
