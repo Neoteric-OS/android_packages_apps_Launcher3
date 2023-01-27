@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 
-import org.yaap.launcher.YaapLauncher;
-import org.yaap.launcher.YaapLauncherModelDelegate;
+import org.zeph.launcher.ZephyrusLauncher;
+import org.zeph.launcher.ZephyrusLauncherModelDelegate;
 
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
@@ -48,10 +48,10 @@ public class SmartspaceViewContainer extends FrameLayout implements PluginListen
         layoutParams.setMarginStart(getResources().getDimensionPixelSize(R.dimen.enhanced_smartspace_margin_start_launcher));
         addView(mView, layoutParams);
 
-        YaapLauncher launcher = (YaapLauncher) ActivityContext.lookupContext(context);
+        ZephyrusLauncher launcher = (ZephyrusLauncher) ActivityContext.lookupContext(context);
         launcher.getLauncherUnlockAnimationController().setSmartspaceView(mView);
 
-        YaapLauncherModelDelegate delegate = (YaapLauncherModelDelegate) launcher.getModel().getModelDelegate();
+        ZephyrusLauncherModelDelegate delegate = (ZephyrusLauncherModelDelegate) launcher.getModel().getModelDelegate();
         BcSmartspaceDataProvider plugin = launcher.getSmartspacePlugin();
         plugin.registerSmartspaceEventNotifier(event -> delegate.notifySmartspaceEvent(event));
         mView.registerDataProvider(plugin);
@@ -64,7 +64,7 @@ public class SmartspaceViewContainer extends FrameLayout implements PluginListen
 
     @Override
     public void onPluginDisconnected(BcSmartspaceDataPlugin plugin) {
-        YaapLauncher launcher = (YaapLauncher) ActivityContext.lookupContext(getContext());
+        ZephyrusLauncher launcher = (ZephyrusLauncher) ActivityContext.lookupContext(getContext());
         mView.registerDataProvider(launcher.getSmartspacePlugin());
     }
 

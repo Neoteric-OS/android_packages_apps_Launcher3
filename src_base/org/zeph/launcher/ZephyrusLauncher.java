@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.yaap.launcher;
+package org.zeph.launcher;
 
 import com.android.launcher3.Launcher;
 
-public class YaapLauncher extends Launcher {
+public class ZephyrusLauncher extends Launcher {
 
 }

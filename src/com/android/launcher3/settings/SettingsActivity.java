@@ -22,7 +22,7 @@ import static com.android.launcher3.Utilities.KEY_DOCK_SEARCH;
 import static com.android.launcher3.Utilities.KEY_SMARTSPACE;
 import static com.android.launcher3.states.RotationHelper.ALLOW_ROTATION_PREFERENCE_KEY;
 
-import static org.yaap.launcher.OverlayCallbackImpl.KEY_ENABLE_MINUS_ONE;
+import static org.zeph.launcher.OverlayCallbackImpl.KEY_ENABLE_MINUS_ONE;
 
 import android.content.Context;
 import android.content.Intent;
