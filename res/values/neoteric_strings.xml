@@ -163,4 +163,10 @@
     <!-- Haptics on DT2S -->
     <string name="pref_haptics_on_dt2s_title">Haptics on double tap to sleep</string>
     <string name="pref_haptics_on_dt2s_summary">Whether to perform haptics when doing double tap to sleep gesture or not</string>
+
+    <!-- A widget category label for grouping widgets related to battery. [CHAR_LIMIT=30] -->
+    <string name="widget_category_battery">Battery</string>
+
+    <!-- A widget category label for grouping widgets related to weather. [CHAR_LIMIT=30] -->
+    <string name="widget_category_weather">Weather</string>
 </resources>
