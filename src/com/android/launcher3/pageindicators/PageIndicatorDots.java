@@ -195,6 +195,10 @@ public class PageIndicatorDots extends View implements Insettable, PageIndicator
 
         mTotalScroll = totalScroll;
 
+        if (mNumPages <= 1) {
+            return;
+        }
+
         float scrollPerPage = (float) totalScroll / (mNumPages - 1);
         float position = currentScroll / scrollPerPage;
 
