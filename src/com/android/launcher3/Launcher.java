@@ -1125,6 +1125,7 @@ public class Launcher extends StatefulActivity<LauncherState>
         TraceHelper.INSTANCE.endSection();
 
         if (mNeedsRestart) {
+            Toast.makeText(this, R.string.restarting_launcher_changes, Toast.LENGTH_SHORT).show();
             Utilities.restart(this);
         }
     }

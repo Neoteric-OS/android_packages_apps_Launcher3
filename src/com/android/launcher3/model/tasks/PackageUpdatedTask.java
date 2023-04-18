@@ -28,6 +28,7 @@ import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
 import android.content.pm.ShortcutInfo;
 import android.os.UserHandle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -37,6 +38,7 @@ import com.android.launcher3.icons.IconCache;
 import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.model.AllAppsList;
 import com.android.launcher3.model.BgDataModel;
+import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.model.ModelTaskController;
 import com.android.launcher3.model.data.AppInfo;
@@ -233,6 +235,8 @@ public class PackageUpdatedTask implements ModelUpdateTask {
         }
 
         if (needsRestart) {
+            Toast.makeText(context, R.string.updating_launcher_components, Toast.LENGTH_SHORT)
+                    .show();
             Utilities.restart(context);
         }
     }
