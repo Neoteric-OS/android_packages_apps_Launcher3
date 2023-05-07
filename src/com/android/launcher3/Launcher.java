@@ -405,7 +405,9 @@ public class Launcher extends StatefulActivity<LauncherState>
             new OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                    if (Utilities.KEY_DRAWER_SEARCH.equals(key)) {
+                    if (Utilities.KEY_DRAWER_SEARCH.equals(key)
+                            || Utilities.KEY_SHORT_PARALLAX.equals(key)
+                            || Utilities.KEY_SINGLE_PAGE_CENTER.equals(key)) {
                         mNeedsRestart = true;
                     }
                 }
