@@ -178,6 +178,8 @@ public final class Utilities {
     public static final String KEY_STATUS_BAR = "pref_show_statusbar";
     public static final String KEY_FORCE_MONOCHROME_ICONS = "pref_forced_monochrome_icons";
     public static final String KEY_DRAWER_SEARCH = "pref_drawer_search";
+    public static final String KEY_SHORT_PARALLAX = "pref_short_parallax";
+    public static final String KEY_SINGLE_PAGE_CENTER = "pref_single_page_center";
 
     /**
      * Returns true if theme is dark.
@@ -936,5 +938,15 @@ public final class Utilities {
     public static boolean showSearch(Context context) {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_DRAWER_SEARCH, true);
+    }
+
+    public static boolean isShortParallax(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_SHORT_PARALLAX, false);
+    }
+
+    public static boolean isSinglePageCentered(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_SINGLE_PAGE_CENTER, false);
     }
 }

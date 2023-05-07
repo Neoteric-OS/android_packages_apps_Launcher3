@@ -131,6 +131,8 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
         switch (key) {
             case Utilities.KEY_DOCK_SEARCH:
             case Utilities.KEY_STATUS_BAR:
+            case Utilities.KEY_SHORT_PARALLAX:
+            case Utilities.KEY_SINGLE_PAGE_CENTER:
                 LauncherAppState.getInstance(this).setNeedsRestart();
                 break;
             default:
