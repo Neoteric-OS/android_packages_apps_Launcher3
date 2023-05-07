@@ -436,6 +436,8 @@ public class Launcher extends StatefulActivity<LauncherState>
                     switch (key) {
                         case Utilities.KEY_DOCK_SEARCH:
                         case Utilities.KEY_DRAWER_SEARCH:
+                        case Utilities.KEY_SHORT_PARALLAX:
+                        case Utilities.KEY_SINGLE_PAGE_CENTER:
                             mNeedsRestart = true;
                             break;
                         default:
