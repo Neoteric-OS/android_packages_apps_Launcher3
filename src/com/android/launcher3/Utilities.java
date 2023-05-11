@@ -176,6 +176,8 @@ public final class Utilities {
     public static final String KEY_SMARTSPACE = "pref_smartspace";
     public static final String KEY_ICON_PACK = "pref_icon_pack";
     public static final String KEY_ALLOW_WALLPAPER_ZOOMING = "pref_allow_wallpaper_zooming";
+    public static final String KEY_FORCE_MONOCHROME_ICONS = "pref_forced_monochrome_icons";
+
     /**
      * Returns true if theme is dark.
      */
@@ -907,7 +909,7 @@ public final class Utilities {
         SharedPreferences prefs = getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_SMARTSPACE, true);
     }
-    
+
     public static boolean hasSecureKeyguard(Context context) {
         final KeyguardManager keyguardManager = context.getSystemService(KeyguardManager.class);
         return keyguardManager != null && keyguardManager.isKeyguardSecure();
@@ -916,6 +918,11 @@ public final class Utilities {
     public static boolean canZoomWallpaper(Context context) {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_ALLOW_WALLPAPER_ZOOMING, true);
+    }
+
+    public static boolean enableMonoChromeThemedIcons(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_FORCE_MONOCHROME_ICONS, false);
     }
 
     /**
