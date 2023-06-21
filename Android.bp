@@ -229,7 +229,7 @@ android_app {
     ],
     required: [
         "privapp_whitelist_com.android.launcher3",
-        "privapp_whitelist_yaap_launcher3.xml",
+        "privapp_whitelist_zeph_launcher3.xml",
     ],
 
     jacoco: {
@@ -331,8 +331,8 @@ android_library {
 }
 
 prebuilt_etc {
-    name: "privapp_whitelist_yaap_launcher3.xml",
-    src: "privapp_whitelist_yaap_launcher3.xml",
+    name: "privapp_whitelist_zeph_launcher3.xml",
+    src: "privapp_whitelist_zeph_launcher3.xml",
     system_ext_specific: true,
     sub_dir: "permissions",
 }
@@ -368,7 +368,7 @@ android_app {
     ],
     required: [
         "privapp_whitelist_com.android.launcher3",
-        "privapp_whitelist_yaap_launcher3.xml",
+        "privapp_whitelist_zeph_launcher3.xml",
     ],
 
     additional_manifests: [
@@ -406,7 +406,7 @@ android_app {
     ],
     required: [
         "privapp_whitelist_com.android.launcher3",
-        "privapp_whitelist_yaap_launcher3.xml",
+        "privapp_whitelist_zeph_launcher3.xml",
     ],
 
     resource_dirs: ["quickstep/res"],
@@ -460,7 +460,7 @@ android_app {
     ],
     required: [
         "privapp_whitelist_com.android.launcher3",
-        "privapp_whitelist_yaap_launcher3.xml",
+        "privapp_whitelist_zeph_launcher3.xml",
     ],
 
     additional_manifests: [

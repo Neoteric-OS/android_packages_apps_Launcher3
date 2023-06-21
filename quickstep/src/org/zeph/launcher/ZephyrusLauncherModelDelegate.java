@@ -1,4 +1,4 @@
-package org.yaap.launcher;
+package org.zeph.launcher;
 
 import android.app.smartspace.SmartspaceConfig;
 import android.app.smartspace.SmartspaceManager;
@@ -29,17 +29,17 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class YaapLauncherModelDelegate extends QuickstepModelDelegate
+public class ZephyrusLauncherModelDelegate extends QuickstepModelDelegate
     implements SmartspaceSession.OnTargetsAvailableListener {
 
-    public static final String TAG = "YaapLauncherModelDelegate";
+    public static final String TAG = "ZephyrusLauncherModelDelegate";
 
     public final Context mContext;
     public final Deque mSmartspaceTargets = new LinkedList();
 
     public SmartspaceSession mSmartspaceSession;
 
-    public YaapLauncherModelDelegate(Context context) {
+    public ZephyrusLauncherModelDelegate(Context context) {
         super(context);
         mContext = context;
     }

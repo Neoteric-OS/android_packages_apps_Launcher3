@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.yaap.launcher;
+package org.zeph.launcher;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
