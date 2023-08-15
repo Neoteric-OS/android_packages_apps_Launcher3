@@ -23,7 +23,7 @@
     LAUNCHER_HOME_SCREEN_ROTATION_ENABLED(615)
     LAUNCHER_HOME_SCREEN_ROTATION_DISABLED(616)
     -->
-    <SwitchPreference
+    <org.zeph.support.preference.SwitchPreference
         android:key="pref_allowRotation"
         android:title="@string/allow_rotation_title"
         android:summary="@string/allow_rotation_desc"
@@ -32,7 +32,7 @@
         launcher:logIdOn="615"
         launcher:logIdOff="616" />
 
-    <SwitchPreference
+    <org.zeph.support.preference.SwitchPreference
         android:defaultValue="false"
         android:key="pref_workspace_lock"
         android:persistent="true"
@@ -44,19 +44,19 @@
         android:key="pref_trust_apps"
         android:title="@string/trust_apps_manager_name" />
 
-    <SwitchPreference
+    <org.zeph.support.preference.SwitchPreference
             android:key="pref_allow_wallpaper_scrolling"
             android:title="@string/allow_wallpaper_scrolling"
             android:summary="@string/allow_wallpaper_scrolling_summary"
             android:defaultValue="true" />
 
-    <SwitchPreference
+    <org.zeph.support.preference.SwitchPreference
             android:key="pref_allow_wallpaper_zooming"
             android:title="@string/allow_wallpaper_zooming"
             android:summary="@string/allow_wallpaper_zooming_summary"
             android:defaultValue="true" />
 
-    <SwitchPreference
+    <org.zeph.support.preference.SwitchPreference
         android:key="pref_dt_gesture"
         android:title="@string/pref_dt_gesture_title"
         android:summary="@string/pref_dt_gesture_summary"
@@ -67,19 +67,19 @@
         android:key="google_category"
         android:title="@string/category_google">
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:defaultValue="true"
             android:key="pref_enable_minus_one"
             android:summary="@string/pref_show_google_now_summary"
             android:title="@string/title_show_google_feed"/>
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_smartspace"
             android:title="@string/smartspace_pref_title"
             android:summary="@string/smartspace_pref_summary"
             android:defaultValue="true" />
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_dock_search"
             android:title="@string/dock_search_title"
             android:summary="@string/dock_search_summary"
@@ -106,7 +106,7 @@
             android:defaultValue=""
             android:persistent="true" />
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_allapps_themed_icons"
             android:title="@string/pref_themed_icons_title"
             android:summary="@string/pref_themed_icons_summary"
@@ -117,7 +117,7 @@
         LAUNCHER_ADD_NEW_APPS_TO_HOME_SCREEN_ENABLED(613)
         LAUNCHER_ADD_NEW_APPS_TO_HOME_SCREEN_DISABLED(614)
         -->
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_add_icon_to_home"
             android:title="@string/auto_add_shortcuts_label"
             android:summary="@string/auto_add_shortcuts_description"
@@ -132,13 +132,13 @@
             android:persistent="false"
             android:widgetLayout="@layout/notification_pref_warning" />
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_desktop_show_labels"
             android:title="@string/desktop_show_labels"
             android:defaultValue="true"
             android:persistent="true" />
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_drawer_show_labels"
             android:title="@string/drawer_show_labels"
             android:defaultValue="true"
@@ -167,19 +167,19 @@
     <PreferenceCategory
         android:title="@string/actions_category_title">
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_recents_screenshot"
             android:title="@string/recents_screenshot_title"
             android:defaultValue="true"
             android:persistent="true" />
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_recents_lens"
             android:title="@string/recents_lens_title"
             android:defaultValue="false"
             android:persistent="true" />
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_recents_clear_all"
             android:title="@string/recents_clear_all_title"
             android:defaultValue="true"
@@ -190,7 +190,7 @@
         android:key="misc_category"
         android:title="@string/category_misc">
 
-        <SwitchPreference
+        <org.zeph.support.preference.SwitchPreference
             android:key="pref_show_top_shadow"
             android:title="@string/show_top_shadow"
             android:defaultValue="true"
