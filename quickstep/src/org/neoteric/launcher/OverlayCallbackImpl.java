@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.zeph.launcher;
+package org.neoteric.launcher;
 
 import android.app.Activity;
 import android.content.SharedPreferences;

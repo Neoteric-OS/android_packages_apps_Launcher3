@@ -1,4 +1,4 @@
-package org.zeph.launcher;
+package org.neoteric.launcher;
 
 import android.app.smartspace.SmartspaceConfig;
 import android.app.smartspace.SmartspaceManager;
@@ -29,17 +29,17 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class ZephyrusLauncherModelDelegate extends QuickstepModelDelegate
+public class NeotericLauncherModelDelegate extends QuickstepModelDelegate
     implements SmartspaceSession.OnTargetsAvailableListener {
 
-    public static final String TAG = "ZephyrusLauncherModelDelegate";
+    public static final String TAG = "NeotericLauncherModelDelegate";
 
     public final Context mContext;
     public final Deque mSmartspaceTargets = new LinkedList<List>();
 
     public SmartspaceSession mSmartspaceSession;
 
-    public ZephyrusLauncherModelDelegate(Context context) {
+    public NeotericLauncherModelDelegate(Context context) {
         super(context);
         mContext = context;
     }

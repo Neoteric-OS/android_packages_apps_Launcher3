@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.zeph.launcher;
+package org.neoteric.launcher;
 
 import com.android.launcher3.Launcher;
 
-public class ZephyrusLauncher extends Launcher {
+public class NeotericLauncher extends Launcher {
 
 }

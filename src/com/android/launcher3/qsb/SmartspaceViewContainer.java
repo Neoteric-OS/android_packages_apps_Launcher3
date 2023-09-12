@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 
-import org.zeph.launcher.ZephyrusLauncher;
-import org.zeph.launcher.ZephyrusLauncherModelDelegate;
+import org.neoteric.launcher.NeotericLauncher;
+import org.neoteric.launcher.NeotericLauncherModelDelegate;
 
 import com.android.launcher3.celllayout.CellLayoutLayoutParams;;
 import com.android.launcher3.DeviceProfile;
@@ -48,10 +48,10 @@ public class SmartspaceViewContainer extends FrameLayout implements PluginListen
         layoutParams.setMarginStart(getResources().getDimensionPixelSize(R.dimen.enhanced_smartspace_margin_start_launcher));
         addView(mView, layoutParams);
 
-        ZephyrusLauncher launcher = (ZephyrusLauncher) ActivityContext.lookupContext(context);
+        NeotericLauncher launcher = (NeotericLauncher) ActivityContext.lookupContext(context);
         launcher.getLauncherUnlockAnimationController().setSmartspaceView(mView);
 
-        ZephyrusLauncherModelDelegate delegate = (ZephyrusLauncherModelDelegate) launcher.getModel().getModelDelegate();
+        NeotericLauncherModelDelegate delegate = (NeotericLauncherModelDelegate) launcher.getModel().getModelDelegate();
         BcSmartspaceDataProvider plugin = launcher.getSmartspacePlugin();
         plugin.registerSmartspaceEventNotifier(event -> delegate.notifySmartspaceEvent(event));
         mView.registerDataProvider(plugin);
@@ -64,7 +64,7 @@ public class SmartspaceViewContainer extends FrameLayout implements PluginListen
 
     @Override
     public void onPluginDisconnected(BcSmartspaceDataPlugin plugin) {
-        ZephyrusLauncher launcher = (ZephyrusLauncher) ActivityContext.lookupContext(getContext());
+        NeotericLauncher launcher = (NeotericLauncher) ActivityContext.lookupContext(getContext());
         mView.registerDataProvider(launcher.getSmartspacePlugin());
     }
 

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.zeph.launcher;
+package org.neoteric.launcher;
 
 import android.app.smartspace.SmartspaceTarget;
 import android.os.Bundle;
 
-import org.zeph.launcher.ZephyrusLauncherModelDelegate.SmartspaceItem;
+import org.neoteric.launcher.NeotericLauncherModelDelegate.SmartspaceItem;
 
 import com.android.launcher3.model.BgDataModel;
 import com.android.launcher3.qsb.LauncherUnlockAnimationController;
@@ -32,7 +32,7 @@ import com.google.android.systemui.smartspace.BcSmartspaceDataProvider;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ZephyrusLauncher extends QuickstepLauncher {
+public class NeotericLauncher extends QuickstepLauncher {
 
     private BcSmartspaceDataProvider mSmartspacePlugin = new BcSmartspaceDataProvider();
     private LauncherUnlockAnimationController mUnlockAnimationController =
