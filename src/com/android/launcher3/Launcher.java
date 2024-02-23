@@ -410,7 +410,8 @@ public class Launcher extends StatefulActivity<LauncherState>
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                     if (Utilities.KEY_DRAWER_SEARCH.equals(key)
                             || Utilities.KEY_SHORT_PARALLAX.equals(key)
-                            || Utilities.KEY_SINGLE_PAGE_CENTER.equals(key)) {
+                            || Utilities.KEY_SINGLE_PAGE_CENTER.equals(key)
+                            || Utilities.KEY_DRAWER_SCROLLBAR.equals(key)) {
                         mNeedsRestart = true;
                     } else if (KEY_DARK_STATUS_BAR.equals(key)) {
                         recreate();
