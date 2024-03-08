@@ -5761,7 +5761,7 @@ public abstract class RecentsView<
     }
 
     private void doScrollScale() {
-        if (showAsGrid())
+        if (showAsGrid() || mContainer.getDeviceProfile().getDeviceProperties().isLargeScreen())
             return;
 
         boolean isInLandscape = mOrientationState.getTouchRotation() != ROTATION_0
