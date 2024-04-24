@@ -26,11 +26,13 @@ import static com.android.launcher3.allapps.BaseAllAppsAdapter.VIEW_TYPE_WORK_ED
 import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCHER_TURN_OFF_WORK_APPS_TAP;
 import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCHER_TURN_ON_WORK_APPS_TAP;
 import static com.android.launcher3.model.data.AppsListData.FLAG_HAS_MULTIPLE_PROFILES;
+import static com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR;
 import static com.android.launcher3.model.data.AppsListData.FLAG_HAS_SHORTCUT_PERMISSION;
 import static com.android.launcher3.model.data.AppsListData.FLAG_QUIET_MODE_CHANGE_PERMISSION;
 import static com.android.launcher3.model.data.AppsListData.FLAG_QUIET_MODE_ENABLED;
 import static com.android.launcher3.model.data.AppsListData.FLAG_WORK_PROFILE_QUIET_MODE_ENABLED;
 
+import android.content.Context;
 import android.os.UserHandle;
 import android.util.Log;
 import android.view.View;
@@ -255,5 +257,15 @@ public class WorkProfileManager extends UserProfileManager
     @Override
     public Predicate<UserHandle> getUserMatcher() {
         return mWorkProfileMatcher;
+    }
+
+    @Override
+    protected void setQuietMode(boolean enabled, Context context) {
+        UI_HELPER_EXECUTOR.post(() ->
+                mUserCache.getUserProfiles()
+                        .stream()
+                        .filter(getUserMatcher())
+                        .forEach(userHandle ->
+                                setQuietModeSafely(enabled, userHandle, context)));
     }
 }
