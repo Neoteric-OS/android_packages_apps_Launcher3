@@ -142,6 +142,7 @@ import android.view.WindowInsetsAnimation;
 import android.view.WindowManager.LayoutParams;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.OvershootInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import android.window.BackEvent;
 import android.window.OnBackAnimationCallback;
@@ -406,6 +407,8 @@ public class Launcher extends StatefulActivity<LauncherState>
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {}
             };
 
+    private InputMethodManager mInputMethodManager;
+
     public static Launcher getLauncher(Context context) {
         return fromContext(context);
     }
@@ -522,6 +525,9 @@ public class Launcher extends StatefulActivity<LauncherState>
         mStartupLatencyLogger.logEnd(LAUNCHER_LATENCY_STARTUP_ACTIVITY_ON_CREATE);
 
         mSharedPrefs.registerOnSharedPreferenceChangeListener(mSharedPrefListener);
+
+        mInputMethodManager = (InputMethodManager) mWorkspace.getContext().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
     }
 
     @NonNull View getAccessibilityActionView() {
@@ -2532,7 +2538,11 @@ public class Launcher extends StatefulActivity<LauncherState>
      * @param progress Transition progress from 0 to 1; where 0 => home and 1 => all apps.
      */
     public void onAllAppsTransition(float progress) {
-        // No-Op
+        if (progress > 0) return;
+        if (mAppsView == null) return;
+        if (mInputMethodManager == null) return;
+        // make sure the keyboard is hidden when the AllApps view is closed
+        mInputMethodManager.hideSoftInputFromWindow(mAppsView.getWindowToken(), 0);
     }
 
     /** @return list of View targets to be blurred based on changes to depth. */
