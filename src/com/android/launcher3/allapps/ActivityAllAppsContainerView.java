@@ -26,6 +26,7 @@ import static com.android.launcher3.allapps.BaseAllAppsAdapter.VIEW_TYPE_WORK_ED
 import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCHER_ALLAPPS_COUNT;
 import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCHER_ALLAPPS_TAP_ON_PERSONAL_TAB;
 import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCHER_ALLAPPS_TAP_ON_WORK_TAB;
+import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 import static com.android.launcher3.util.ScrollableLayoutManager.PREDICTIVE_BACK_MIN_SCALE;
 import static com.android.launcher3.views.RecyclerViewFastScroller.FastScrollerLocation.ALL_APPS_SCROLLER;
 
@@ -366,9 +367,18 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
 
     /** Invoke when the current search session is finished. */
     public void onClearSearchResult() {
+        final boolean wasIMEActive = mSearchUiManager.getEditText().hasFocus();
         getMainAdapterProvider().clearHighlightedItem();
         animateToSearchState(false);
         rebindAdapters();
+        if (!wasIMEActive || mAllAppsTransitionController.getProgress() != 0f)
+            return;
+        MAIN_EXECUTOR.getHandler().post(() -> {
+            // show the keyboard again. we just erased the last char.
+            // doesn't mean we want it gone
+            mSearchUiManager.getEditText().requestFocus();
+            mSearchUiManager.getEditText().showKeyboard();
+        });
     }
 
     /**
