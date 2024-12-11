@@ -160,6 +160,7 @@ import androidx.window.embedding.RuleController;
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.accessibility.LauncherAccessibilityDelegate;
 import com.android.launcher3.allapps.ActivityAllAppsContainerView;
+import com.android.launcher3.allapps.AllAppsStore;
 import com.android.launcher3.allapps.AllAppsTransitionController;
 import com.android.launcher3.allapps.DiscoveryBounce;
 import com.android.launcher3.anim.AnimationSuccessListener;
@@ -219,6 +220,7 @@ import com.android.launcher3.util.IntSet;
 import com.android.launcher3.util.ItemInflater;
 import com.android.launcher3.util.KeyboardShortcutsDelegate;
 import com.android.launcher3.util.LauncherBindableItemsContainer;
+import com.android.launcher3.util.PackageManagerHelper;
 import com.android.launcher3.util.PackageUserKey;
 import com.android.launcher3.util.PendingRequestArgs;
 import com.android.launcher3.util.RunnableList;
@@ -259,16 +261,19 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * Default launcher application.
  */
 public class Launcher extends StatefulActivity<LauncherState>
-        implements InvariantDeviceProfile.OnIDPChangeListener {
+        implements InvariantDeviceProfile.OnIDPChangeListener,
+        AllAppsStore.OnUpdateListener {
     public static final String TAG = "Launcher";
 
     public static final ContextTracker.ActivityTracker<Launcher> ACTIVITY_TRACKER =
@@ -394,6 +399,7 @@ public class Launcher extends StatefulActivity<LauncherState>
             new CannedAnimationCoordinator(this);
 
     private final List<BackPressHandler> mBackPressedHandlers = new ArrayList<>();
+    private static boolean sShouldUpdateSuspensions = true;
 
     private boolean mIsNaturalScrollingEnabled;
 
@@ -1231,6 +1237,7 @@ public class Launcher extends StatefulActivity<LauncherState>
         // Setup Apps
         mAppsView = findViewById(R.id.apps_view);
         mAppsView.setAllAppsTransitionController(mAllAppsController);
+        mAppsView.getAppsStore().addUpdateListener(this);
 
         // Setup Scrim
         mScrimView = findViewById(R.id.scrim_view);
@@ -1248,6 +1255,41 @@ public class Launcher extends StatefulActivity<LauncherState>
 
         mItemInflater = new ItemInflater<>(this, mAppWidgetHolder, getItemOnClickListener(),
                 mFocusHandler, new CellLayout(mWorkspace.getContext(), mWorkspace));
+    }
+
+    @Override
+    public void onAppsUpdated() {
+        if (sShouldUpdateSuspensions) {
+            // We do this only once.
+            sShouldUpdateSuspensions = false;
+            updateSuspensions();
+        }
+    }
+
+    /**
+     * Reapply suspensions to apps we paused, so as to update suspend dialogs. This is necessary
+     * to ensure that the resources used by the dialog are still correct, particularly in the event
+     * that our app was updated after the suspension took place and may have different resource IDs.
+     */
+    private void updateSuspensions() {
+        final PackageManagerHelper pmHelper = new PackageManagerHelper(this);
+
+        final Map<UserHandle, List<String>> pausedAppsByUser =
+                Stream.of(mAppsView.getAppsStore().getApps())
+                        .filter(i -> pmHelper.isAppSuspendedByUs(i.getTargetPackage(), i.user))
+                        .collect(Collectors.groupingBy((ItemInfo item) -> item.user,
+                                Collectors.mapping(item -> item.getTargetPackage(),
+                                        Collectors.toList())));
+
+        pausedAppsByUser.forEach((targetUser, packages) -> {
+            Log.d(TAG, "Re-suspending apps to update suspend dialogs for user " + targetUser
+                    + ": " + packages);
+            try {
+                pmHelper.suspendPackages(packages, targetUser);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to re-suspend packages for user " + targetUser + "!", e);
+            }
+        });
     }
 
     /**
