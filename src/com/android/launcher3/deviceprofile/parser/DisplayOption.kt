@@ -157,6 +157,8 @@ private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedA
             R.styleable.ProfileDisplayOption_allAppsCellHeightTwoPanelPortrait,
             R.styleable.ProfileDisplayOption_allAppsCellWidthTwoPanelLandscape,
             R.styleable.ProfileDisplayOption_allAppsCellHeightTwoPanelLandscape,
+            // Grids that don't size their all apps cells separately reuse the workspace cell.
+            startValue = minCellSize[INDEX_DEFAULT],
         )
 
     @JvmField

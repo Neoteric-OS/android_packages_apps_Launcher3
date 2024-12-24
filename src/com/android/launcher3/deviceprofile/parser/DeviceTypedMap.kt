@@ -61,9 +61,10 @@ object DeviceTypedMap {
         indexTwoPanelPortraitY: Int,
         indexTwoPanelLandscapeX: Int,
         indexTwoPanelLandscapeY: Int,
+        startValue: PointF = PointF(0f, 0f),
     ) =
         parseTypedMap(
-            PointF(0f, 0f),
+            startValue,
             indexDefaultX to indexDefaultY,
             indexLandscapeX to indexLandscapeY,
             indexTwoPanelPortraitX to indexTwoPanelPortraitY,
