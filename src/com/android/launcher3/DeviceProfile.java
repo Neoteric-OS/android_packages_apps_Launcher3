@@ -427,7 +427,8 @@ public class DeviceProfile {
         isTablet = info.isTablet(windowBounds);
         isPhone = !isTablet;
         isTwoPanels = isTablet && isMultiDisplay;
-        boolean allowTaskbar = prefs.getBoolean(KEY_PHONE_TASKBAR, isTablet);
+        boolean allowTaskbar = isPhone ? prefs.getBoolean(KEY_PHONE_TASKBAR, isTablet) && isGestureMode
+                : prefs.getBoolean(KEY_PHONE_TASKBAR, isTablet);
         isTaskbarPresent = allowTaskbar && wmProxy.isTaskbarDrawnInProcess();
 
         // Some more constants.

@@ -313,6 +313,13 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
                     );
                     return !info.isTablet(info.realBounds);
 
+                case DeviceProfile.KEY_PHONE_TASKBAR:
+                    DeviceProfile dp = LauncherAppState.getIDP(getContext()).getDeviceProfile(getContext());
+                    if (dp.isPhone && !dp.isGestureMode) {
+                        return false;
+                    }
+                    return true;
+
             }
 
             return true;
