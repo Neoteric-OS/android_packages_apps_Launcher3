@@ -24,6 +24,7 @@ import com.android.launcher3.CustomLauncherModelDelegate.SmartspaceItem;
 import com.android.launcher3.model.BgDataModel;
 import com.android.launcher3.qsb.LauncherUnlockAnimationController;
 import com.android.launcher3.uioverrides.QuickstepLauncher;
+import com.android.launcher3.wallpaper.WallpaperDatabase;
 import com.android.quickstep.SystemUiProxy;
 
 import com.google.android.systemui.smartspace.BcSmartspaceDataProvider;
@@ -48,6 +49,7 @@ public class CustomLauncher extends QuickstepLauncher {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         SystemUiProxy.INSTANCE.get(this).setLauncherUnlockAnimationController(this.getClass().getSimpleName(), mUnlockAnimationController);
+        WallpaperDatabase.INSTANCE.get(this).checkpointSync();
     }
 
     @Override

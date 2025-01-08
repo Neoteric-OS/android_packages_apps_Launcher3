@@ -26,6 +26,11 @@ import androidx.annotation.VisibleForTesting
 import com.android.launcher3.Utilities
 import com.android.launcher3.util.Executors.MAIN_EXECUTOR
 import com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR
+import com.android.launcher3.wallpaper.WallpaperService;
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * This class caches the system's wallpaper color hints for use by other classes as a performance
@@ -68,6 +73,9 @@ class WallpaperColorHints(private val context: Context) : SafeCloseable {
             if (newHints != hints) {
                 hints = newHints
                 onColorHintsChangedListeners.forEach { it.onColorHintsChanged(newHints) }
+            }
+            CoroutineScope(Dispatchers.IO).launch {
+                WallpaperService(context).saveWallpaper(wallpaperManager)
             }
         }
     }

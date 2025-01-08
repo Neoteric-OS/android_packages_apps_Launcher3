@@ -104,6 +104,7 @@ import com.android.launcher3.views.ActivityContext;
 import com.android.launcher3.views.BaseDragLayer;
 import com.android.launcher3.widget.PendingAddShortcutInfo;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
@@ -970,5 +971,11 @@ public final class Utilities {
     public static boolean enableAutoIme(Context context) {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_AUTO_KEYABORD, false);
+    }
+
+    public static byte[] bitmapToByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 }
