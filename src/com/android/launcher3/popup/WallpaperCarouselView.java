@@ -20,13 +20,17 @@ import androidx.core.content.ContextCompat;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.views.IconFrame;
 import com.android.launcher3.R;
-import com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR;
+import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
+import static com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.views.ActivityContext;
 import com.android.launcher3.wallpaper.Wallpaper;
 import com.android.launcher3.wallpaper.WallpaperDatabase;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
 
 public class WallpaperCarouselView extends LinearLayout {
@@ -53,11 +57,22 @@ public class WallpaperCarouselView extends LinearLayout {
         UI_HELPER_EXECUTOR.execute(() -> {
             try {
                 List<Wallpaper> wallpapers = WallpaperDatabase.INSTANCE.get(getContext()).getTopWallpapers();
+
+                // Deduplicate wallpapers by imagePath
+                Set<String> seenImagePaths = new HashSet<>();
+                List<Wallpaper> uniqueWallpapers = new ArrayList<>();
+                for (Wallpaper wallpaper : wallpapers) {
+                    if (!seenImagePaths.contains(wallpaper.getImagePath())) {
+                        seenImagePaths.add(wallpaper.getImagePath());
+                        uniqueWallpapers.add(wallpaper);
+                    }
+                }
+
                 post(() -> {
                     loadingView.setVisibility(GONE);
-                    setVisibility(wallpapers == null || wallpapers.isEmpty() ? GONE : VISIBLE);
-                    if (wallpapers != null && !wallpapers.isEmpty()) {
-                        displayWallpapers(wallpapers);
+                    setVisibility(uniqueWallpapers.isEmpty() ? GONE : VISIBLE);
+                    if (!uniqueWallpapers.isEmpty()) {
+                        displayWallpapers(uniqueWallpapers);
                     }
                 });
             } catch (Exception e) {
@@ -161,18 +176,19 @@ public class WallpaperCarouselView extends LinearLayout {
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
 
-                    // Update the database with the new wallpaper and its timestamp
+                    // Update the database with the new wallpaper
                     wallpaper.setTimestamp(System.currentTimeMillis());
                     WallpaperDatabase.INSTANCE.get(getContext()).insertOrUpdate(wallpaper);
 
                     currentWallpaper = wallpaper;
+
+                    // Refresh the carousel to show updated data
+                    fetchWallpapers();
+
                     post(() -> {
                         currentCardView.removeView(loadingSpinner);
                         addIconFrameToCard(currentCardView);
                     });
-
-                    // Refresh the carousel view to reflect the updated database state
-                    fetchWallpapers();
                 }
             } catch (Exception e) {
                 Log.e("WallpaperCarouselView", "Error setting wallpaper: " + e.getMessage());
@@ -224,10 +240,14 @@ public class WallpaperCarouselView extends LinearLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         UI_HELPER_EXECUTOR.execute(() -> {
-            // Clean-up logic
+            // Perform background cleanup
             currentWallpaper = null;
-            iconFrame.setImageBitmap(null);
-            removeAllViews();
+
+            // Schedule UI updates on the main thread using MAIN_EXECUTOR
+            MAIN_EXECUTOR.execute(() -> {
+                iconFrame.setImageBitmap(null);
+                removeAllViews();
+            });
         });
     }
 }
