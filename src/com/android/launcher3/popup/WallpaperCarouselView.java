@@ -62,6 +62,13 @@ public class WallpaperCarouselView extends LinearLayout {
                 // Deduplicate wallpapers by imagePath
                 Set<String> seenImagePaths = new HashSet<>();
                 List<Wallpaper> uniqueWallpapers = new ArrayList<>();
+
+                // Ensure currentWallpaper is included at the start
+                if (currentWallpaper != null && currentWallpaper.getImagePath() != null) {
+                    seenImagePaths.add(currentWallpaper.getImagePath());
+                    uniqueWallpapers.add(currentWallpaper); // Add the current wallpaper first
+                }
+
                 for (Wallpaper wallpaper : wallpapers) {
                     if (!seenImagePaths.contains(wallpaper.getImagePath())) {
                         seenImagePaths.add(wallpaper.getImagePath());
@@ -92,17 +99,28 @@ public class WallpaperCarouselView extends LinearLayout {
             removeViewAt(0);
         }
 
-        // Clear existing views only if there's a change in the wallpaper list
-        if (getChildCount() != wallpapers.size() || isWallpaperListChanged(wallpapers)) {
+        // Filter out duplicates before refreshing the view
+        List<Wallpaper> displayedWallpapers = new ArrayList<>();
+        Set<String> seenImagePaths = new HashSet<>();
+        for (Wallpaper wallpaper : wallpapers) {
+            if (wallpaper != null && wallpaper.getImagePath() != null && !seenImagePaths.contains(wallpaper.getImagePath())) {
+                seenImagePaths.add(wallpaper.getImagePath());
+                displayedWallpapers.add(wallpaper);
+            }
+        }
+
+        // Update only if the wallpaper list has changed
+        if (isWallpaperListChanged(displayedWallpapers)) {
             removeAllViews();
+
             int totalWidth = getWidth() > 0 ? getWidth() : (int) (deviceProfile.widthPx * 0.8);
             double firstItemWidth = totalWidth * 0.5;
             double remainingWidth = totalWidth - firstItemWidth;
             double marginBetweenItems = totalWidth * 0.02;
-            double itemWidth = (remainingWidth - (marginBetweenItems * (wallpapers.size() - 1))) / (wallpapers.size() - 1);
+            double itemWidth = (remainingWidth - (marginBetweenItems * (displayedWallpapers.size() - 1))) / (displayedWallpapers.size() - 1);
 
-            for (int index = 0; index < wallpapers.size(); index++) {
-                Wallpaper wallpaper = wallpapers.get(index);
+            for (int index = 0; index < displayedWallpapers.size(); index++) {
+                Wallpaper wallpaper = displayedWallpapers.get(index);
                 if (isWallpaperInvalid(wallpaper)) continue;
                 CardView cardView = createWallpaperCard(wallpaper, index, firstItemWidth, itemWidth, marginBetweenItems);
                 addView(cardView);
@@ -198,7 +216,11 @@ public class WallpaperCarouselView extends LinearLayout {
     }
 
     private void setWallpaper(Wallpaper wallpaper) {
-        if (wallpaper.equals(currentWallpaper)) return;
+        if (wallpaper.equals(currentWallpaper)) {
+            // If the wallpaper is already the current one, just refresh the view
+            fetchWallpapers();
+            return;
+        }
 
         ProgressBar loadingSpinner = new ProgressBar(getContext());
         loadingSpinner.setIndeterminate(true);
@@ -222,6 +244,7 @@ public class WallpaperCarouselView extends LinearLayout {
                     wallpaper.setTimestamp(System.currentTimeMillis());
                     WallpaperDatabase.INSTANCE.get(getContext()).insertOrUpdate(wallpaper);
 
+                    // Update the current wallpaper
                     currentWallpaper = wallpaper;
 
                     // Refresh the carousel with the updated database state
