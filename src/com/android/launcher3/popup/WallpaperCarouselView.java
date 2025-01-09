@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -86,6 +87,11 @@ public class WallpaperCarouselView extends LinearLayout {
     }
 
     private void displayWallpapers(List<Wallpaper> wallpapers) {
+        // Remove the ProgressBar if it exists
+        if (getChildAt(0) instanceof ProgressBar) {
+            removeViewAt(0);
+        }
+
         // Clear existing views only if there's a change in the wallpaper list
         if (getChildCount() != wallpapers.size() || isWallpaperListChanged(wallpapers)) {
             removeAllViews();
@@ -106,20 +112,33 @@ public class WallpaperCarouselView extends LinearLayout {
     }
 
     private boolean isWallpaperListChanged(List<Wallpaper> wallpapers) {
-        if (getChildCount() != wallpapers.size()) {
-            return true;
-        }
+        int cardViewIndex = 0; // Track index in the wallpaper list
         for (int i = 0; i < getChildCount(); i++) {
-            CardView existingCard = (CardView) getChildAt(i);
-            Wallpaper existingWallpaper = (Wallpaper) existingCard.getTag();
-            Wallpaper newWallpaper = wallpapers.get(i);
+            View child = getChildAt(i);
 
-            // Handle null cases
-            if (existingWallpaper == null || newWallpaper == null || !existingWallpaper.equals(newWallpaper)) {
+            // Skip non-CardView children, like ProgressBar
+            if (!(child instanceof CardView)) {
+                continue;
+            }
+
+            CardView existingCard = (CardView) child;
+            Wallpaper existingWallpaper = (Wallpaper) existingCard.getTag();
+
+            // Handle index mismatch or null cases
+            if (cardViewIndex >= wallpapers.size() || existingWallpaper == null) {
                 return true;
             }
+
+            Wallpaper newWallpaper = wallpapers.get(cardViewIndex);
+            if (!existingWallpaper.equals(newWallpaper)) {
+                return true;
+            }
+
+            cardViewIndex++;
         }
-        return false;
+
+        // Check if all wallpapers are accounted for
+        return cardViewIndex != wallpapers.size();
     }
 
     private boolean isWallpaperInvalid(Wallpaper wallpaper) {
@@ -137,6 +156,9 @@ public class WallpaperCarouselView extends LinearLayout {
         );
         layoutParams.setMargins(index > 0 ? (int) marginBetweenItems : 0, 0, 0, 0);
         cardView.setLayoutParams(layoutParams);
+
+        // Assign the wallpaper as the tag for comparison later
+        cardView.setTag(wallpaper);
 
         cardView.setOnClickListener(v -> {
             if (index != currentItemIndex) {
