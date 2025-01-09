@@ -227,14 +227,14 @@ public class WallpaperCarouselView extends LinearLayout {
                     // Refresh the carousel with the updated database state
                     fetchWallpapers();
 
-                    post(() -> {
+                    MAIN_EXECUTOR.execute(() -> {
                         currentCardView.removeView(loadingSpinner);
                         addIconFrameToCard(currentCardView);
                     });
                 }
             } catch (Exception e) {
                 Log.e("WallpaperCarouselView", "Error setting wallpaper: " + e.getMessage());
-                post(() -> {
+                MAIN_EXECUTOR.execute(() -> {
                     currentCardView.removeView(loadingSpinner);
                     addIconFrameToCard(currentCardView);
                 });

@@ -69,21 +69,23 @@ public class WallpaperDatabase implements SafeCloseable {
 
     // Insert or Update Wallpaper
     public void insertOrUpdate(Wallpaper wallpaper) {
-        Wallpaper existingWallpaper = getWallpaperByImagePath(wallpaper.getImagePath());
-        if (existingWallpaper != null) {
-            // Update the timestamp of the existing wallpaper
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_TIMESTAMP, wallpaper.getTimestamp());
-            String whereClause = COLUMN_ID + " = ?";
-            String[] whereArgs = {String.valueOf(existingWallpaper.getId())};
-            database.update(TABLE_WALLPAPER, values, whereClause, whereArgs);
-        } else {
-            // Insert the new wallpaper
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_IMAGE_PATH, wallpaper.getImagePath());
-            values.put(COLUMN_RANK, wallpaper.getRank());
-            values.put(COLUMN_TIMESTAMP, wallpaper.getTimestamp());
-            database.insert(TABLE_WALLPAPER, null, values);
+        synchronized (this) {
+            Wallpaper existingWallpaper = getWallpaperByImagePath(wallpaper.getImagePath());
+            if (existingWallpaper != null) {
+                // Update the timestamp of the existing wallpaper
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_TIMESTAMP, wallpaper.getTimestamp());
+                String whereClause = COLUMN_ID + " = ?";
+                String[] whereArgs = {String.valueOf(existingWallpaper.getId())};
+                database.update(TABLE_WALLPAPER, values, whereClause, whereArgs);
+            } else {
+                // Insert the new wallpaper
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_IMAGE_PATH, wallpaper.getImagePath());
+                values.put(COLUMN_RANK, wallpaper.getRank());
+                values.put(COLUMN_TIMESTAMP, wallpaper.getTimestamp());
+                database.insert(TABLE_WALLPAPER, null, values);
+            }
         }
     }
 
