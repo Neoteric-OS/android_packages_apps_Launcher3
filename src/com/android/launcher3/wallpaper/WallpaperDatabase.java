@@ -49,12 +49,42 @@ public class WallpaperDatabase implements SafeCloseable {
         this.database = helper.getWritableDatabase();
     }
 
-    public void insert(Wallpaper wallpaper) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_IMAGE_PATH, wallpaper.getImagePath());
-        values.put(COLUMN_RANK, wallpaper.getRank());
-        values.put(COLUMN_TIMESTAMP, wallpaper.getTimestamp());
-        database.insert(TABLE_WALLPAPER, null, values);
+    // Get Wallpaper by Image Path
+    public Wallpaper getWallpaperByImagePath(String imagePath) {
+        String query = "SELECT * FROM " + TABLE_WALLPAPER + " WHERE " + COLUMN_IMAGE_PATH + " = ?";
+        try (Cursor cursor = database.rawQuery(query, new String[]{imagePath})) {
+            if (cursor.moveToFirst()) {
+                return new Wallpaper(
+                        cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE_PATH)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RANK)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIMESTAMP))
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if no wallpaper is found
+    }
+
+    // Insert or Update Wallpaper
+    public void insertOrUpdate(Wallpaper wallpaper) {
+        Wallpaper existingWallpaper = getWallpaperByImagePath(wallpaper.getImagePath());
+        if (existingWallpaper != null) {
+            // Update the timestamp of the existing wallpaper
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_TIMESTAMP, wallpaper.getTimestamp());
+            String whereClause = COLUMN_ID + " = ?";
+            String[] whereArgs = {String.valueOf(existingWallpaper.getId())};
+            database.update(TABLE_WALLPAPER, values, whereClause, whereArgs);
+        } else {
+            // Insert the new wallpaper
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_IMAGE_PATH, wallpaper.getImagePath());
+            values.put(COLUMN_RANK, wallpaper.getRank());
+            values.put(COLUMN_TIMESTAMP, wallpaper.getTimestamp());
+            database.insert(TABLE_WALLPAPER, null, values);
+        }
     }
 
     public List<Wallpaper> getTopWallpapers() {
@@ -81,9 +111,9 @@ public class WallpaperDatabase implements SafeCloseable {
     }
 
     public void updateRank(int currentRank) {
-        String query = "UPDATE " + TABLE_WALLPAPER + 
-                       " SET " + COLUMN_RANK + " = " + COLUMN_RANK + " + 1" +
-                       " WHERE " + COLUMN_RANK + " >= ?";
+        String query = "UPDATE " + TABLE_WALLPAPER +
+                " SET " + COLUMN_RANK + " = " + COLUMN_RANK + " + 1" +
+                " WHERE " + COLUMN_RANK + " >= ?";
         database.execSQL(query, new Object[]{currentRank});
     }
 

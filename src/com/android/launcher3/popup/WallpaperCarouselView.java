@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.views.IconFrame;
 import com.android.launcher3.R;
+import com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.views.ActivityContext;
 import com.android.launcher3.wallpaper.Wallpaper;
@@ -27,8 +28,6 @@ import com.android.launcher3.wallpaper.WallpaperDatabase;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class WallpaperCarouselView extends LinearLayout {
     private final DeviceProfile deviceProfile;
@@ -36,7 +35,6 @@ public class WallpaperCarouselView extends LinearLayout {
     private int currentItemIndex = 0;
     private final IconFrame iconFrame;
     private Wallpaper currentWallpaper;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public WallpaperCarouselView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -52,7 +50,7 @@ public class WallpaperCarouselView extends LinearLayout {
     }
 
     private void fetchWallpapers() {
-        executorService.execute(() -> {
+        UI_HELPER_EXECUTOR.execute(() -> {
             try {
                 List<Wallpaper> wallpapers = WallpaperDatabase.INSTANCE.get(getContext()).getTopWallpapers();
                 post(() -> {
@@ -96,6 +94,7 @@ public class WallpaperCarouselView extends LinearLayout {
     private CardView createWallpaperCard(Wallpaper wallpaper, int index, double firstItemWidth, double itemWidth, double marginBetweenItems) {
         CardView cardView = new CardView(getContext());
         cardView.setRadius(Themes.getDialogCornerRadius(getContext()) / 2);
+        cardView.setCardElevation(0); // Removed shadow by setting elevation to 0
 
         LayoutParams layoutParams = new LayoutParams(
                 index == currentItemIndex ? (int) firstItemWidth : (int) itemWidth,
@@ -120,11 +119,13 @@ public class WallpaperCarouselView extends LinearLayout {
     }
 
     private void loadWallpaperBitmapAsync(Wallpaper wallpaper, CardView cardView) {
-        executorService.execute(() -> {
+        UI_HELPER_EXECUTOR.execute(() -> {
             try {
                 File imageFile = new File(wallpaper.getImagePath());
                 if (imageFile.exists() && imageFile.canRead()) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(wallpaper.getImagePath());
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 2; // Scale down bitmap to reduce memory usage
+                    Bitmap bitmap = BitmapFactory.decodeFile(wallpaper.getImagePath(), options);
                     if (bitmap != null) {
                         post(() -> {
                             ImageView imageView = (ImageView) cardView.getChildAt(0);
@@ -141,6 +142,7 @@ public class WallpaperCarouselView extends LinearLayout {
 
     private void setWallpaper(Wallpaper wallpaper) {
         if (wallpaper.equals(currentWallpaper)) return;
+
         ProgressBar loadingSpinner = new ProgressBar(getContext());
         loadingSpinner.setIndeterminate(true);
         FrameLayout.LayoutParams spinnerParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -151,18 +153,26 @@ public class WallpaperCarouselView extends LinearLayout {
         currentCardView.removeView(iconFrame);
         currentCardView.addView(loadingSpinner);
 
-        executorService.execute(() -> {
+        UI_HELPER_EXECUTOR.execute(() -> {
             try {
                 WallpaperManager wallpaperManager = WallpaperManager.getInstance(getContext());
                 Bitmap bitmap = BitmapFactory.decodeFile(wallpaper.getImagePath());
                 if (bitmap != null) {
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
+
+                    // Update the database with the new wallpaper and its timestamp
+                    wallpaper.setTimestamp(System.currentTimeMillis());
+                    WallpaperDatabase.INSTANCE.get(getContext()).insertOrUpdate(wallpaper);
+
                     currentWallpaper = wallpaper;
                     post(() -> {
                         currentCardView.removeView(loadingSpinner);
                         addIconFrameToCard(currentCardView);
                     });
+
+                    // Refresh the carousel view to reflect the updated database state
+                    fetchWallpapers();
                 }
             } catch (Exception e) {
                 Log.e("WallpaperCarouselView", "Error setting wallpaper: " + e.getMessage());
@@ -213,8 +223,11 @@ public class WallpaperCarouselView extends LinearLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (!executorService.isShutdown()) {
-            executorService.shutdownNow();
-        }
+        UI_HELPER_EXECUTOR.execute(() -> {
+            // Clean-up logic
+            currentWallpaper = null;
+            iconFrame.setImageBitmap(null);
+            removeAllViews();
+        });
     }
 }

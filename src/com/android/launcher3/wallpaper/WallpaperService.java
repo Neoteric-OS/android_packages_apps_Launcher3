@@ -44,7 +44,7 @@ public class WallpaperService implements SafeCloseable {
 
         if (topWallpapers.size() < 4) {
             Wallpaper wallpaper = new Wallpaper(0, imagePath, topWallpapers.size(), timestamp);
-            WallpaperDatabase.INSTANCE.get(context).insert(wallpaper);
+            WallpaperDatabase.INSTANCE.get(context).insertOrUpdate(wallpaper);
         } else {
             Wallpaper lowestRankedWallpaper = topWallpapers.stream()
                 .min(Comparator.comparingLong(Wallpaper::getTimestamp))
@@ -59,7 +59,7 @@ public class WallpaperService implements SafeCloseable {
             }
 
             Wallpaper newWallpaper = new Wallpaper(0, imagePath, 0, timestamp);
-            WallpaperDatabase.INSTANCE.get(context).insert(newWallpaper);
+            WallpaperDatabase.INSTANCE.get(context).insertOrUpdate(newWallpaper);
         }
     }
 

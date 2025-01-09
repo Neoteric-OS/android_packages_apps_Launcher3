@@ -1,6 +1,7 @@
 package com.android.launcher3.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
@@ -60,6 +61,15 @@ public class IconFrame extends FrameLayout {
      */
     public void setIcon(@DrawableRes int drawableRes) {
         imageView.setImageResource(drawableRes);
+    }
+
+    /**
+     * Set a bitmap for the ImageView.
+     *
+     * @param bitmap The bitmap to set.
+     */
+    public void setImageBitmap(Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
     }
 
     /**
