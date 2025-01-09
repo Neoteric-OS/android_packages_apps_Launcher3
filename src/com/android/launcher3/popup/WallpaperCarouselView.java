@@ -68,7 +68,7 @@ public class WallpaperCarouselView extends LinearLayout {
                     }
                 }
 
-                post(() -> {
+                MAIN_EXECUTOR.execute(() -> {
                     loadingView.setVisibility(GONE);
                     setVisibility(uniqueWallpapers.isEmpty() ? GONE : VISIBLE);
                     if (!uniqueWallpapers.isEmpty()) {
@@ -77,7 +77,7 @@ public class WallpaperCarouselView extends LinearLayout {
                 });
             } catch (Exception e) {
                 Log.e("WallpaperCarouselView", "Error fetching wallpapers: " + e.getMessage());
-                post(() -> {
+                MAIN_EXECUTOR.execute(() -> {
                     loadingView.setVisibility(GONE);
                     setVisibility(GONE);
                 });
@@ -86,20 +86,40 @@ public class WallpaperCarouselView extends LinearLayout {
     }
 
     private void displayWallpapers(List<Wallpaper> wallpapers) {
-        removeAllViews();
-        int totalWidth = getWidth() > 0 ? getWidth() : (int) (deviceProfile.widthPx * 0.8);
-        double firstItemWidth = totalWidth * 0.5;
-        double remainingWidth = totalWidth - firstItemWidth;
-        double marginBetweenItems = totalWidth * 0.02;
-        double itemWidth = (remainingWidth - (marginBetweenItems * (wallpapers.size() - 1))) / (wallpapers.size() - 1);
+        // Clear existing views only if there's a change in the wallpaper list
+        if (getChildCount() != wallpapers.size() || isWallpaperListChanged(wallpapers)) {
+            removeAllViews();
+            int totalWidth = getWidth() > 0 ? getWidth() : (int) (deviceProfile.widthPx * 0.8);
+            double firstItemWidth = totalWidth * 0.5;
+            double remainingWidth = totalWidth - firstItemWidth;
+            double marginBetweenItems = totalWidth * 0.02;
+            double itemWidth = (remainingWidth - (marginBetweenItems * (wallpapers.size() - 1))) / (wallpapers.size() - 1);
 
-        for (int index = 0; index < wallpapers.size(); index++) {
-            Wallpaper wallpaper = wallpapers.get(index);
-            if (isWallpaperInvalid(wallpaper)) continue;
-            CardView cardView = createWallpaperCard(wallpaper, index, firstItemWidth, itemWidth, marginBetweenItems);
-            addView(cardView);
-            loadWallpaperBitmapAsync(wallpaper, cardView);
+            for (int index = 0; index < wallpapers.size(); index++) {
+                Wallpaper wallpaper = wallpapers.get(index);
+                if (isWallpaperInvalid(wallpaper)) continue;
+                CardView cardView = createWallpaperCard(wallpaper, index, firstItemWidth, itemWidth, marginBetweenItems);
+                addView(cardView);
+                loadWallpaperBitmapAsync(wallpaper, cardView);
+            }
         }
+    }
+
+    private boolean isWallpaperListChanged(List<Wallpaper> wallpapers) {
+        if (getChildCount() != wallpapers.size()) {
+            return true;
+        }
+        for (int i = 0; i < getChildCount(); i++) {
+            CardView existingCard = (CardView) getChildAt(i);
+            Wallpaper existingWallpaper = (Wallpaper) existingCard.getTag();
+            Wallpaper newWallpaper = wallpapers.get(i);
+
+            // Handle null cases
+            if (existingWallpaper == null || newWallpaper == null || !existingWallpaper.equals(newWallpaper)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isWallpaperInvalid(Wallpaper wallpaper) {
@@ -182,7 +202,7 @@ public class WallpaperCarouselView extends LinearLayout {
 
                     currentWallpaper = wallpaper;
 
-                    // Refresh the carousel to show updated data
+                    // Refresh the carousel with the updated database state
                     fetchWallpapers();
 
                     post(() -> {
