@@ -1359,7 +1359,7 @@ public class Launcher extends StatefulActivity<LauncherState>
 
         if (mNeedsRestart) {
             Toast.makeText(this, R.string.restarting_launcher_changes, Toast.LENGTH_SHORT).show();
-            Utilities.restart(this);
+            Utilities.restart();
         }
     }
 
