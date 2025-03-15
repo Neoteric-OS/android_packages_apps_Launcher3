@@ -145,6 +145,9 @@ public class TaskbarManager implements DisplayDecorationListener {
     public static final Uri NAV_BAR_INVERSE = Settings.Secure.getUriFor(
             "sysui_nav_bar_inverse");
 
+    public static final Uri NAVIGATION_BAR_HINT = Settings.Secure.getUriFor(
+            Settings.Secure.NAVIGATION_BAR_HINT);
+
     private final Context mBaseContext;
     private final int mPrimaryDisplayId;
     private final TaskbarNavButtonCallbacks mNavCallbacks;
@@ -251,6 +254,8 @@ public class TaskbarManager implements DisplayDecorationListener {
         recreateTaskbars();
     };
     private final SettingsCache.OnChangeListener mEnableTaskBarListener;
+
+    private final SettingsCache.OnChangeListener mOnTaskBarChangeListener = c -> System.exit(0);
 
     private PerceptibleTaskListener mTaskStackListener;
 
@@ -466,6 +471,8 @@ public class TaskbarManager implements DisplayDecorationListener {
                 .register(NAV_BAR_KIDS_MODE, mOnSettingsChangeListener);
         SettingsCache.INSTANCE.get(mPrimaryWindowContext)
                 .register(NAV_BAR_INVERSE, mOnSettingsChangeListener);
+        SettingsCache.INSTANCE.get(mPrimaryWindowContext)
+                .register(NAVIGATION_BAR_HINT, mOnTaskBarChangeListener);
         mEnableTaskBarListener = c -> {
             // Create the illusion of this taking effect immediately
             // Also needed because TaskbarManager inits before SystemUiProxy on start
@@ -1134,6 +1141,8 @@ public class TaskbarManager implements DisplayDecorationListener {
                 .unregister(NAV_BAR_KIDS_MODE, mOnSettingsChangeListener);
         SettingsCache.INSTANCE.get(mPrimaryWindowContext)
                 .unregister(NAV_BAR_INVERSE, mOnSettingsChangeListener);
+        SettingsCache.INSTANCE.get(mPrimaryWindowContext)
+                .unregister(NAVIGATION_BAR_HINT, mOnTaskBarChangeListener);
         SystemDecorationChangeObserver.getINSTANCE().get(mPrimaryWindowContext)
                 .unregisterDisplayDecorationListener(this);
         debugPrimaryTaskbar("destroy: unregistering component callbacks");
