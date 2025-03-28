@@ -87,6 +87,7 @@ import android.os.IRemoteCallback;
 import android.os.SystemProperties;
 import android.os.Trace;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Display;
@@ -488,7 +489,11 @@ public class QuickstepLauncher extends Launcher implements RecentsViewContainer,
 
         shortcuts.addAll(getSplitShortcuts());
         shortcuts.add(UNINSTALL);
-        shortcuts.add(FREE_FORM);
+        if (Settings.Global.getInt(asContext().getContentResolver(),
+                Settings.Global.DEVELOPMENT_ENABLE_FREEFORM_WINDOWS_SUPPORT, 0) != 0
+                && !DesktopModeStatus.canEnterDesktopMode(this)) {
+            shortcuts.add(FREE_FORM);
+        }
         shortcuts.add(PAUSE_APPS);
         shortcuts.add(WIDGETS);
         shortcuts.add(INSTALL);
