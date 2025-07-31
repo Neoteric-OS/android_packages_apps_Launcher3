@@ -142,7 +142,7 @@ public abstract class ArrowPopup<T extends ActivityContext> extends AbstractFloa
 
         // Initialize arrow view
         final Resources resources = getResources();
-        mArrowColor = getContext().getColor(R.color.materialColorSurfaceContainer);
+        mArrowColor = getContext().getColor(R.color.materialColorSurfaceContainerHigh);
         mChildContainerMargin = resources.getDimensionPixelSize(R.dimen.popup_margin);
         mArrowWidth = resources.getDimensionPixelSize(R.dimen.popup_arrow_width);
         mArrowHeight = resources.getDimensionPixelSize(R.dimen.popup_arrow_height);
@@ -174,7 +174,7 @@ public abstract class ArrowPopup<T extends ActivityContext> extends AbstractFloa
                     getContext().getColor(R.color.popup_shade_third)
             };
         } else {
-            mColors = new int[]{getContext().getColor(R.color.materialColorSurfaceContainer)};
+            mColors = new int[]{getContext().getColor(R.color.materialColorSurfaceContainerHigh)};
         }
     }
 
