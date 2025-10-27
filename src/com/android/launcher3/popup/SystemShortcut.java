@@ -561,13 +561,13 @@ public abstract class SystemShortcut<T extends ActivityContext> extends ItemInfo
         private ActivityOptions makeLaunchOptions(Activity activity) {
             ActivityOptions activityOptions = ActivityOptions.makeBasic();
             activityOptions.setLaunchWindowingMode(WINDOWING_MODE_FREEFORM);
+            // Arbitrary bounds only because freeform is in dev mode right now
             final View decorView = activity.getWindow().getDecorView();
             final WindowInsets insets = decorView.getRootWindowInsets();
             final Rect r = new Rect(0, 0, decorView.getWidth() / 2, decorView.getHeight() / 2);
-            r.offsetTo(insets.getSystemWindowInsetLeft() + 50, insets.getSystemWindowInsetTop() + 50);
+            r.offsetTo(insets.getSystemWindowInsetLeft() + 50,
+                    insets.getSystemWindowInsetTop() + 50);
             activityOptions.setLaunchBounds(r);
-            activityOptions.setSplashScreenStyle(SplashScreen.SPLASH_SCREEN_STYLE_ICON);
-            activityOptions.setTaskOverlay(true /* taskOverlay */, true /* canResume */);
             return activityOptions;
         }
     }
