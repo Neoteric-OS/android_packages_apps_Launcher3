@@ -38,6 +38,10 @@
     <string name="hide_top_shadow_title">Hide top shadow</string>
     <string name="hide_top_shadow_summary">Remove shadow underneath the status bar</string>
 
+    <!-- Search bar -->
+    <string name="pref_show_hotseat_qsb_title">Show search bar</string>
+    <string name="pref_show_hotseat_qsb_summary">At the bottom of your home screen</string>
+
     <!-- Settings categories -->
     <string name="category_google">Google</string>
     <string name="category_icon">Icons</string>
