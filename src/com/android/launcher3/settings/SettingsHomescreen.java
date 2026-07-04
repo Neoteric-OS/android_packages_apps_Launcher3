@@ -31,6 +31,7 @@ import androidx.core.view.WindowCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference.OnPreferenceChangeListener;
 
+import com.android.launcher3.Flags;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.LauncherPrefs;
@@ -168,8 +169,10 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
         private boolean mPreferenceHighlighted = false;
 
         private static final String KEY_MINUS_ONE = "pref_enable_minus_one";
+        private static final String SHOW_HOTSEAT_QSB_KEY = "pref_show_hotseat_qsb";
 
         private Preference mShowGoogleAppPref;
+        private Preference mShowHotseatQsbPref;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -191,6 +194,10 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
             }
 
             mShowGoogleAppPref = screen.findPreference(KEY_MINUS_ONE);
+            mShowHotseatQsbPref = screen.findPreference(SHOW_HOTSEAT_QSB_KEY);
+            if (mShowHotseatQsbPref != null && !Flags.enableQsbOnHotseat()) {
+                mShowHotseatQsbPref.setVisible(false);
+            }
             updateIsGoogleAppEnabled();
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {
@@ -225,6 +232,9 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
         private void updateIsGoogleAppEnabled() {
             if (mShowGoogleAppPref != null) {
                 mShowGoogleAppPref.setEnabled(Utilities.isGSAEnabled(getContext()));
+            }
+            if (mShowHotseatQsbPref != null) {
+                mShowHotseatQsbPref.setEnabled(Utilities.isGSAEnabled(getContext()));
             }
         }
 
