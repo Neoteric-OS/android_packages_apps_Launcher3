@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 Neoteric OS
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+
+    <!-- Backdrop of the icon and text size preview card. -->
+    <color name="icon_preview_background">@android:color/white</color>
+
+</resources>

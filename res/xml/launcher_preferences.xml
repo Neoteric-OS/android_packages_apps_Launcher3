@@ -33,12 +33,6 @@
         android:persistent="true" />
 
     <SwitchPreferenceCompat
-        android:key="pref_desktop_show_labels"
-        android:title="@string/desktop_show_labels"
-        android:defaultValue="true"
-        android:persistent="true" />
-
-    <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="pref_workspace_lock"
         android:persistent="true"
@@ -88,12 +82,6 @@
             android:summary="@string/pref_themed_icons_summary"
             android:defaultValue="false"
             android:persistent="true" />
-
-        <SwitchPreferenceCompat
-            android:key="pref_drawer_show_labels"
-            android:title="@string/drawer_show_labels"
-            android:defaultValue="true"
-            android:persistent="true" />
     </androidx.preference.PreferenceCategory>
 
     <androidx.preference.PreferenceCategory
@@ -119,33 +107,67 @@
             android:persistent="false"
             android:widgetLayout="@layout/notification_pref_warning" />
 
-        <com.android.launcher3.settings.preferences.PercentSliderPreference
-        android:key="pref_icon_size"
-        android:title="@string/icon_size_title"
-        android:persistent="true"
-        android:max="200"
-        android:defaultValue="100"
-        launcher:min="50"
-        launcher:seekBarIncrement="5"
-        launcher:showSeekBarValue="true"
-        launcher:iconStart="@drawable/ic_slider_minus"
-        launcher:iconStartContentDescription="@string/icon_size_make_smaller_desc"
-        launcher:iconEnd="@drawable/ic_slider_plus"
-        launcher:iconEndContentDescription="@string/icon_size_make_larger_desc" />
+        <androidx.preference.PreferenceScreen
+            android:key="pref_icon_size_screen"
+            android:title="@string/icon_size_screen_title"
+            android:summary="@string/icon_size_screen_summary">
 
-        <com.android.launcher3.settings.preferences.PercentSliderPreference
-        android:key="pref_font_size"
-        android:title="@string/font_size_title"
-        android:persistent="true"
-        android:max="200"
-        android:defaultValue="100"
-        launcher:min="50"
-        launcher:seekBarIncrement="5"
-        launcher:showSeekBarValue="true"
-        launcher:iconStart="@drawable/ic_slider_minus"
-        launcher:iconStartContentDescription="@string/font_size_make_smaller_desc"
-        launcher:iconEnd="@drawable/ic_slider_plus"
-        launcher:iconEndContentDescription="@string/font_size_make_larger_desc" />
+            <com.android.launcher3.settings.preview.IconPreviewPreference
+                android:key="pref_icon_size_preview" />
+
+            <androidx.preference.PreferenceCategory
+                android:key="icon_size_options"
+                android:title="@string/icon_size_options_title">
+
+                <com.android.launcher3.settings.preferences.PercentSliderPreference
+                    android:key="pref_icon_size"
+                    android:title="@string/icon_size_title"
+                    android:persistent="true"
+                    android:max="200"
+                    android:defaultValue="100"
+                    launcher:min="50"
+                    launcher:seekBarIncrement="5"
+                    launcher:showSeekBarValue="true"
+                    launcher:iconStart="@drawable/ic_slider_minus"
+                    launcher:iconStartContentDescription="@string/icon_size_make_smaller_desc"
+                    launcher:iconEnd="@drawable/ic_slider_plus"
+                    launcher:iconEndContentDescription="@string/icon_size_make_larger_desc" />
+
+                <com.android.launcher3.settings.preferences.PercentSliderPreference
+                    android:key="pref_font_size"
+                    android:title="@string/font_size_title"
+                    android:persistent="true"
+                    android:max="200"
+                    android:defaultValue="100"
+                    launcher:min="50"
+                    launcher:seekBarIncrement="5"
+                    launcher:showSeekBarValue="true"
+                    launcher:iconStart="@drawable/ic_slider_minus"
+                    launcher:iconStartContentDescription="@string/font_size_make_smaller_desc"
+                    launcher:iconEnd="@drawable/ic_slider_plus"
+                    launcher:iconEndContentDescription="@string/font_size_make_larger_desc" />
+
+            </androidx.preference.PreferenceCategory>
+
+            <androidx.preference.PreferenceCategory
+                android:key="icon_label_options"
+                android:title="@string/icon_label_options_title">
+
+                <SwitchPreferenceCompat
+                    android:key="pref_desktop_show_labels"
+                    android:title="@string/desktop_show_labels"
+                    android:defaultValue="true"
+                    android:persistent="true" />
+
+                <SwitchPreferenceCompat
+                    android:key="pref_drawer_show_labels"
+                    android:title="@string/drawer_show_labels"
+                    android:defaultValue="true"
+                    android:persistent="true" />
+
+            </androidx.preference.PreferenceCategory>
+
+        </androidx.preference.PreferenceScreen>
 
     </androidx.preference.PreferenceCategory>
 </androidx.preference.PreferenceScreen>

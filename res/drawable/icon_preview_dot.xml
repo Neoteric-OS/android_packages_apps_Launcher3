@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 Neoteric OS
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <size
+        android:width="@dimen/icon_preview_dot_size"
+        android:height="@dimen/icon_preview_dot_size" />
+    <solid android:color="@color/settingslib_materialColorPrimary" />
+</shape>

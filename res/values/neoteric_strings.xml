@@ -44,6 +44,15 @@
     <string name="hide_top_shadow_summary">Remove shadow underneath the status bar</string>
 
     <!-- Icon and text size -->
+    <string name="icon_label_options_title">Label options</string>
+    <string name="icon_size_options_title">Size options</string>
+    <string name="icon_preview_label">Preview</string>
+    <string name="icon_preview_home_label">Home screen</string>
+    <string name="icon_preview_drawer_label">App drawer</string>
+    <!-- Icon and text size -->
+    <string name="icon_size_screen_title">Icons and labels</string>
+    <string name="icon_size_screen_summary">Size of app icons, and whether labels are shown</string>
+
     <!-- Icon size -->
     <string name="icon_size_title">Icon size</string>
     <string name="icon_size_make_smaller_desc">Make icons smaller</string>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 Neoteric OS
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/settingslib_expressive_space_small1"
+    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/icon_preview_background"
+        android:clipChildren="true"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/icon_preview_padding_top"
+        android:paddingBottom="@dimen/icon_preview_padding_bottom">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:importantForAccessibility="noHideDescendants"
+            android:text="@string/icon_preview_label"
+            android:textAppearance="@style/TextAppearance.SettingsLib.BodySmall"
+            android:textColor="@color/settingslib_materialColorPrimary" />
+
+        <TextView
+            android:id="@+id/icon_preview_page_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="@dimen/icon_preview_header_spacing"
+            android:textAppearance="@style/TextAppearance.SettingsLib.TitleMedium"
+            android:textColor="@color/settingslib_materialColorPrimary" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/icon_preview_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="noHideDescendants"
+            android:nestedScrollingEnabled="false" />
+
+        <LinearLayout
+            android:id="@+id/icon_preview_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/icon_preview_header_spacing" />
+
+    </LinearLayout>
+
+</FrameLayout>

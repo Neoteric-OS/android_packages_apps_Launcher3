@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 Neoteric OS
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+
+    <!-- Sample app grid shown above the icon and text size sliders. -->
+    <dimen name="icon_preview_radius">28dp</dimen>
+    <dimen name="icon_preview_padding_top">20dp</dimen>
+    <dimen name="icon_preview_padding_bottom">12dp</dimen>
+    <dimen name="icon_preview_header_spacing">8dp</dimen>
+    <dimen name="icon_preview_row_spacing">16dp</dimen>
+    <dimen name="icon_preview_dot_size">6dp</dimen>
+    <dimen name="icon_preview_dot_spacing">4dp</dimen>
+
+</resources>
