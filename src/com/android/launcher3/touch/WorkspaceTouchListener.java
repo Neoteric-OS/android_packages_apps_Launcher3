@@ -33,6 +33,8 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.PowerManager;
+import android.os.RemoteException;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.InputDevice;
@@ -40,6 +42,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
+import android.view.WindowManagerGlobal;
 
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.BoxSelectionHelper;
@@ -60,6 +63,8 @@ import com.android.launcher3.util.VibratorWrapper;
  */
 public class WorkspaceTouchListener extends GestureDetector.SimpleOnGestureListener
         implements OnTouchListener {
+
+    private static final String TAG = "WorkspaceTouchListener";
 
     /**
      * STATE_PENDING_PARENT_INFORM is the state between longPress performed & the next motionEvent.
@@ -249,6 +254,11 @@ public class WorkspaceTouchListener extends GestureDetector.SimpleOnGestureListe
     public boolean onDoubleTap(MotionEvent event) {
         if (LauncherPrefs.getPrefs(mContext).getBoolean(SLEEP_GESTURE, true)) {
             VibratorWrapper.INSTANCE.get(mContext).vibrate(VibratorWrapper.EFFECT_CLICK);
+            try {
+                WindowManagerGlobal.getWindowManagerService().lockNow(null /* options */);
+            } catch (RemoteException e) {
+                Log.e(TAG, "Failed to lock the device on sleep gesture", e);
+            }
             mPm.goToSleep(event.getEventTime());
         }
         return true;
