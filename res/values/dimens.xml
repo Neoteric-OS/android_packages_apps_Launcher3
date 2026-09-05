@@ -111,12 +111,11 @@
     <dimen name="min_page_snap_velocity">1500dp</dimen>
 
     <!-- All Apps -->
-    <dimen name="all_apps_search_bar_field_height">52dp</dimen>
-    <!-- all_apps_search_bar_field_height / 2 -->
-    <dimen name="all_apps_search_bar_content_overlap">26dp</dimen>
+    <dimen name="all_apps_search_bar_field_height">48dp</dimen>
+    <dimen name="all_apps_search_bar_content_overlap">24dp</dimen>
     <!-- affects padding above apps lists when tabs and floating header rows are not visible -->
     <!-- (always affects padding above search results) -->
-    <dimen name="all_apps_search_bar_bottom_padding">30dp</dimen>
+    <dimen name="all_apps_search_bar_bottom_padding">36dp</dimen>
     <!-- margin adjustment for layout relative to bottom of search container -->
     <!-- if the search container is obscuring things, try adjusting this -->
     <dimen name="all_apps_search_bar_bottom_adjustment">-6dp</dimen>
@@ -153,7 +152,7 @@
     <dimen name="all_apps_recycler_view_decorator_result_radius">4dp</dimen>
 
     <dimen name="all_apps_icon_drawable_padding">8dp</dimen>
-    <dimen name="all_apps_predicted_icon_vertical_padding">16dp</dimen>
+    <dimen name="all_apps_predicted_icon_vertical_padding">8dp</dimen>
     <!-- The size of corner radius of the arrow in the arrow toast. -->
     <dimen name="arrow_toast_corner_radius">2dp</dimen>
     <dimen name="arrow_toast_elevation">2dp</dimen>
