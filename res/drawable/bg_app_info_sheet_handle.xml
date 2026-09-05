@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material 3 bottom sheet drag handle: 32x4dp, fully rounded, outline variant. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/materialColorOutlineVariant" />
+    <corners android:radius="2dp" />
+</shape>
