@@ -102,8 +102,16 @@ public class AppsSearchContainerLayout extends ExtendedEditText
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // Update the width to match the grid padding
         DeviceProfile dp = mLauncher.getDeviceProfile();
+        if (!dp.getHotseatProfile().isQsbInline()) {
+            // Share the hotseat search bar's width, so the drawer search bar, the home screen
+            // search bar and the dock icons all start and end on the same edge. The inline
+            // (tablet) hotseat QSB is a different shape, so that case keeps the grid maths.
+            super.onMeasure(makeMeasureSpec(dp.getHotseatQsbWidth(), EXACTLY), heightMeasureSpec);
+            return;
+        }
+
+        // Update the width to match the grid padding
         int myRequestedWidth = getSize(widthMeasureSpec);
         int rowWidth = myRequestedWidth - mAppsView.getActiveRecyclerView().getPaddingLeft()
                 - mAppsView.getActiveRecyclerView().getPaddingRight();
