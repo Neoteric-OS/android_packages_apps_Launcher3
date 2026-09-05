@@ -15,10 +15,9 @@
 -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout
-        android:id="@+id/widgets_bottom_sheet"
+        android:id="@+id/app_info_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/bottom_sheet_handle_margin"
         android:orientation="vertical">
 
         <View
@@ -26,26 +25,30 @@
             android:layout_width="@dimen/bottom_sheet_handle_width"
             android:layout_height="@dimen/bottom_sheet_handle_height"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/bottom_sheet_handle_margin"
             android:layout_marginBottom="@dimen/bottom_sheet_handle_margin"
-            android:visibility="gone"
-            android:background="@drawable/bg_rounded_corner_bottom_sheet_handle"/>
+            android:background="@drawable/bg_app_info_sheet_handle" />
 
+        <!-- Headline small -->
         <TextView
-            style="@style/TextHeadline"
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/app_info_sheet_horizontal_padding"
+            android:layout_marginEnd="@dimen/app_info_sheet_horizontal_padding"
+            android:layout_marginBottom="8dp"
             android:gravity="center_horizontal"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="24sp"/>
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="24sp"
+            android:textColor="@color/materialColorOnSurface" />
 
-        <fragment
-            android:id="@+id/sheet_prefs"
-            android:name="com.android.launcher3.customization.InfoBottomSheet$PrefsFragment"
+        <LinearLayout
+            android:id="@+id/app_info_rows"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="40dp" />
+            android:paddingBottom="8dp"
+            android:orientation="vertical" />
 
     </LinearLayout>
 </merge>

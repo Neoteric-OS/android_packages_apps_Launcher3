@@ -1,54 +1,58 @@
 package com.android.launcher3.customization;
 
-import android.app.ActivityOptions;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
-import androidx.recyclerview.widget.RecyclerView;
-import android.graphics.Rect;
-
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.android.launcher3.model.data.ItemInfo;
-import com.android.launcher3.Insettable;
-import com.android.launcher3.Launcher;
-import com.android.launcher3.QuickstepTransitionManager;
-import com.android.launcher3.uioverrides.QuickstepLauncher;
-import com.android.launcher3.R;
-import com.android.launcher3.util.ActivityOptionsWrapper;
-import com.android.launcher3.util.ComponentKey;
-import com.android.launcher3.views.AbstractSlideInView;
-import com.android.launcher3.util.PackageManagerHelper;
-
-import com.android.launcher3.settings.preference.IconPackPrefSetter;
-import com.android.launcher3.settings.preference.ReloadingListPreference;
-import com.android.launcher3.util.AppReloader;
-
 import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 import static com.android.launcher3.util.Executors.THREAD_POOL_EXECUTOR;
 
+import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Rect;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.android.launcher3.Insettable;
+import com.android.launcher3.Launcher;
+import com.android.launcher3.QuickstepTransitionManager;
+import com.android.launcher3.R;
+import com.android.launcher3.icons.pack.IconPackManager;
+import com.android.launcher3.model.data.ItemInfo;
+import com.android.launcher3.uioverrides.QuickstepLauncher;
+import com.android.launcher3.util.AppReloader;
+import com.android.launcher3.util.ComponentKey;
+import com.android.launcher3.util.PackageManagerHelper;
+import com.android.launcher3.views.AbstractSlideInView;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 /**
- * Bottom sheet showing app details for the "App info" long-press shortcut.
+ * Material 3 bottom sheet showing app details for the "App info" long-press shortcut.
  *
- * A17 removed WidgetsBottomSheet, so this sheet sits on AbstractSlideInView directly and only
- * keeps the parts it used: a bottom aligned content view with the default open/close animation.
+ * <p>Rides on {@link AbstractSlideInView}, which already provides the bottom sheet interaction
+ * (scrim, slide in, drag to dismiss). The rows are plain views: Launcher is not a
+ * FragmentActivity, so androidx preferences cannot be hosted here, and five fixed rows do not
+ * need a RecyclerView behind them.
  */
 public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements Insettable {
     private static final int DEFAULT_CLOSE_DURATION = 200;
 
-    private final FragmentManager mFragmentManager;
-    protected static Rect mSourceBounds;
-    protected static Context mViewContext;
+    private ViewGroup mRows;
+    private View mIconPackRow;
+
+    private Context mViewContext;
+    private Rect mSourceBounds;
+
+    private ItemInfo mItemInfo;
+    private ComponentName mComponent;
+    private ComponentKey mKey;
 
     public InfoBottomSheet(Context context) {
         this(context, null);
@@ -61,9 +65,9 @@ public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements In
     public InfoBottomSheet(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);
-        mFragmentManager = Launcher.getLauncher(context).getFragmentManager();
     }
 
+    /** Records where the sheet was opened from, for the "More" details activity transition. */
     public void configureBottomSheet(Rect sourceBounds, Context context) {
         mSourceBounds = sourceBounds;
         mViewContext = context;
@@ -72,7 +76,8 @@ public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements In
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mContent = findViewById(R.id.widgets_bottom_sheet);
+        mContent = findViewById(R.id.app_info_sheet);
+        mRows = findViewById(R.id.app_info_rows);
         setContentBackgroundWithParent(
                 getContext().getDrawable(R.drawable.bg_rounded_corner_bottom_sheet), mContent);
     }
@@ -100,11 +105,45 @@ public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements In
     }
 
     public void populateAndShow(ItemInfo itemInfo) {
+        mItemInfo = itemInfo;
+        mComponent = itemInfo.getTargetComponent();
+        mKey = new ComponentKey(mComponent, itemInfo.user);
+
         ((TextView) findViewById(R.id.title)).setText(itemInfo.title);
 
-        PrefsFragment fragment =
-                (PrefsFragment) mFragmentManager.findFragmentById(R.id.sheet_prefs);
-        fragment.loadForApp(itemInfo);
+        View version = addRow(R.drawable.ic_app_info_version, R.string.app_info_version);
+        View lastUpdate = addRow(R.drawable.ic_app_info_last_update, R.string.app_info_last_update);
+        View source = addRow(R.drawable.ic_app_info_source, R.string.app_info_source);
+        mIconPackRow = addRow(R.drawable.ic_app_info_icon_pack, R.string.icon_pack_title);
+        View more = addRow(R.drawable.ic_info_no_shadow, R.string.app_info_more);
+
+        setSummary(mIconPackRow, currentIconPackLabel());
+        mIconPackRow.setOnClickListener(v -> showIconPackPicker());
+        more.setOnClickListener(v -> {
+            PackageManagerHelper.startDetailsActivityForInfo(
+                    mViewContext != null ? mViewContext : getContext(), mItemInfo, mSourceBounds,
+                    ActivityOptions.makeBasic().toBundle());
+            // Leaves the launcher, so close for the same reason openSource does.
+            close(false);
+        });
+
+        THREAD_POOL_EXECUTOR.execute(() -> {
+            MetadataExtractor extractor = new MetadataExtractor(getContext(), mComponent);
+            CharSequence sourceLabel = extractor.getSource();
+            CharSequence lastUpdateLabel = extractor.getLastUpdate();
+            CharSequence versionLabel = getContext().getString(R.string.app_info_version_value,
+                    extractor.getVersionName(), extractor.getVersionCode());
+            Intent marketIntent = extractor.getMarketIntent();
+
+            MAIN_EXECUTOR.execute(() -> {
+                setSummary(version, versionLabel);
+                setSummary(lastUpdate, lastUpdateLabel);
+                setSummary(source, sourceLabel);
+                if (marketIntent != null) {
+                    source.setOnClickListener(v -> openSource(v, marketIntent));
+                }
+            });
+        });
 
         attachToContainer();
         mIsOpen = false;
@@ -114,15 +153,103 @@ public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements In
         }
     }
 
-    @Override
-    public void onDetachedFromWindow() {
-        Fragment pf = mFragmentManager.findFragmentById(R.id.sheet_prefs);
-        if (pf != null) {
-            mFragmentManager.beginTransaction()
-                    .remove(pf)
-                    .commitAllowingStateLoss();
+    private View addRow(int iconRes, int titleRes) {
+        View row = LayoutInflater.from(getContext())
+                .inflate(R.layout.app_info_row, mRows, false);
+        ((ImageView) row.findViewById(android.R.id.icon)).setImageResource(iconRes);
+        ((TextView) row.findViewById(android.R.id.title)).setText(titleRes);
+        row.findViewById(android.R.id.summary).setVisibility(GONE);
+        mRows.addView(row);
+        return row;
+    }
+
+    private void setSummary(View row, CharSequence summary) {
+        TextView view = row.findViewById(android.R.id.summary);
+        view.setText(summary);
+        view.setVisibility(VISIBLE);
+    }
+
+    /**
+     * Opens the store the app was installed from. The sheet closes on the way out, otherwise it
+     * is still up behind the app when the launch animation is reversed on the way back.
+     */
+    private void openSource(View row, Intent intent) {
+        try {
+            Launcher.getLauncher(getContext()).startActivity(intent,
+                    getAppTransitionManager().getActivityLaunchOptions(row, mItemInfo).toBundle());
+            close(false);
+        } catch (Exception ignored) {
         }
-        super.onDetachedFromWindow();
+    }
+
+    /**
+     * The sheet only ever shows over the launcher, so it reuses the launcher's transition manager
+     * rather than building (and registering remote animations for) a second one.
+     */
+    private QuickstepTransitionManager getAppTransitionManager() {
+        return ((QuickstepLauncher) Launcher.getLauncher(getContext())).getAppTransitionManager();
+    }
+
+    private String currentIconPackLabel() {
+        String pack = IconDatabase.getByComponent(getContext(), mKey);
+        if (IconDatabase.VALUE_DEFAULT.equals(pack)) {
+            return getContext().getString(R.string.icon_pack_default_label);
+        }
+        CharSequence name = IconPackManager.get(getContext()).getProviderNames().get(pack);
+        return name != null ? name.toString()
+                : getContext().getString(R.string.icon_pack_default_label);
+    }
+
+    /** Packs that provide an icon for this app, plus the "system default" entry at the top. */
+    private void showIconPackPicker() {
+        IconPackManager manager = IconPackManager.get(getContext());
+        Map<String, CharSequence> packs = manager.getProviderNames();
+        for (String pkg : new HashSet<>(packs.keySet())) {
+            if (!manager.packContainsActivity(pkg, mComponent)) {
+                packs.remove(pkg);
+            }
+        }
+
+        String global = IconDatabase.getGlobal(getContext());
+        List<Map.Entry<String, CharSequence>> sorted = new ArrayList<>(packs.entrySet());
+        sorted.sort((a, b) -> a.getValue().toString().toLowerCase()
+                .compareTo(b.getValue().toString().toLowerCase()));
+
+        CharSequence[] labels = new CharSequence[sorted.size() + 1];
+        String[] values = new String[labels.length];
+        labels[0] = getContext().getString(R.string.icon_pack_default_label);
+        values[0] = packs.containsKey(global) ? IconDatabase.VALUE_DEFAULT : global;
+        for (int i = 0; i < sorted.size(); i++) {
+            labels[i + 1] = sorted.get(i).getValue();
+            values[i + 1] = sorted.get(i).getKey();
+        }
+
+        String current = IconDatabase.getByComponent(getContext(), mKey);
+        int checked = 0;
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals(current)) {
+                checked = i;
+                break;
+            }
+        }
+
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.icon_pack_title)
+                .setSingleChoiceItems(labels, checked, (dialog, which) -> {
+                    setIconPack(values[which]);
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void setIconPack(String pack) {
+        if (pack.equals(IconDatabase.getGlobal(getContext()))) {
+            IconDatabase.resetForComponent(getContext(), mKey);
+        } else {
+            IconDatabase.setForComponent(getContext(), mKey, pack);
+        }
+        AppReloader.get(getContext()).reload(mKey);
+        setSummary(mIconPackRow, currentIconPackLabel());
     }
 
     @Override
@@ -133,126 +260,5 @@ public class InfoBottomSheet extends AbstractSlideInView<Launcher> implements In
     @Override
     public boolean isOfType(int type) {
         return (type & TYPE_WIDGETS_BOTTOM_SHEET) != 0;
-    }
-
-    public static class PrefsFragment extends PreferenceFragment
-            implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
-        private static final String KEY_ICON_PACK = "pref_app_info_icon_pack";
-        private static final String KEY_SOURCE = "pref_app_info_source";
-        private static final String KEY_LAST_UPDATE = "pref_app_info_last_update";
-        private static final String KEY_VERSION = "pref_app_info_version";
-        private static final String KEY_MORE = "pref_app_info_more";
-
-        private Context mContext;
-
-        private ItemInfo mItemInfo;
-
-        private ComponentName mComponent;
-        private ComponentKey mKey;
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            mContext = getActivity();
-        }
-
-        /**
-         * The sheet only ever shows over the launcher, so it reuses the launcher's transition
-         * manager rather than building (and registering remote animations for) a second one.
-         */
-        private QuickstepTransitionManager getAppTransitionManager() {
-            return ((QuickstepLauncher) Launcher.getLauncher(mContext)).getAppTransitionManager();
-        }
-
-        public ActivityOptionsWrapper getActivityLaunchOptions(View v) {
-            return getAppTransitionManager().getActivityLaunchOptions(v, mItemInfo);
-        }
-
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            addPreferencesFromResource(R.xml.app_info_preferences);
-        }
-
-        @Override
-        public RecyclerView onCreateRecyclerView(LayoutInflater inflater, ViewGroup parent,
-                                                 Bundle savedInstanceState) {
-            RecyclerView view = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
-            view.setOverScrollMode(View.OVER_SCROLL_NEVER);
-            return view;
-        }
-
-        public void loadForApp(ItemInfo itemInfo) {
-            mComponent = itemInfo.getTargetComponent();
-            mItemInfo = itemInfo;
-            mKey = new ComponentKey(mComponent, itemInfo.user);
-
-            ReloadingListPreference icons = (ReloadingListPreference) findPreference(KEY_ICON_PACK);
-            icons.setValue(IconDatabase.getByComponent(mContext, mKey));
-            icons.setOnReloadListener(ctx -> new IconPackPrefSetter(ctx, mComponent));
-            icons.setOnPreferenceChangeListener(this);
-
-            THREAD_POOL_EXECUTOR.execute(() -> {
-                MetadataExtractor extractor = new MetadataExtractor(mContext, mComponent);
-
-                CharSequence source = extractor.getSource();
-                CharSequence lastUpdate = extractor.getLastUpdate();
-                CharSequence version = mContext.getString(
-                        R.string.app_info_version_value,
-                        extractor.getVersionName(),
-                        extractor.getVersionCode());
-                Intent marketIntent = extractor.getMarketIntent();
-
-                MAIN_EXECUTOR.execute(() -> {
-                    Preference sourcePref = findPreference(KEY_SOURCE);
-                    Preference lastUpdatePref = findPreference(KEY_LAST_UPDATE);
-                    Preference versionPref = findPreference(KEY_VERSION);
-                    Preference morePref = findPreference(KEY_MORE);
-
-                    sourcePref.setSummary(source);
-                    lastUpdatePref.setSummary(lastUpdate);
-                    versionPref.setSummary(version);
-                    morePref.setOnPreferenceClickListener(this);
-
-                    if (marketIntent != null) {
-                        sourcePref.setOnPreferenceClickListener(
-                                pref -> tryStartActivity(marketIntent));
-                    }
-                });
-            });
-        }
-
-        private boolean tryStartActivity(Intent intent) {
-            Launcher launcher = Launcher.getLauncher(mContext);
-            Bundle opts = getAppTransitionManager()
-                    .getActivityLaunchOptions(getView(), mItemInfo)
-                    .toBundle();
-            try {
-                launcher.startActivity(intent, opts);
-            } catch (Exception ignored) {
-            }
-            return false;
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
-            if (newValue.equals(IconDatabase.getGlobal(mContext))) {
-                IconDatabase.resetForComponent(mContext, mKey);
-            } else {
-                IconDatabase.setForComponent(mContext, mKey, (String) newValue);
-            }
-            AppReloader.get(mContext).reload(mKey);
-            return true;
-        }
-
-        private void onMoreClick() {
-            PackageManagerHelper.startDetailsActivityForInfo(InfoBottomSheet.mViewContext, mItemInfo,
-                    InfoBottomSheet.mSourceBounds, ActivityOptions.makeBasic().toBundle());
-        }
-
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            onMoreClick();
-            return true;
-        }
     }
 }
