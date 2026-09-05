@@ -5760,7 +5760,7 @@ public abstract class RecentsView<
         doScrollScale();
     }
 
-    private void doScrollScale() {
+    protected void doScrollScale() {
         if (showAsGrid() || mContainer.getDeviceProfile().getDeviceProperties().isLargeScreen())
             return;
 
@@ -5779,6 +5779,11 @@ public abstract class RecentsView<
             View child = getChildAt(i);
             int scaleArea = child.getWidth() + mPageSpacing;
             int childPosition = mPageScrolls[i];
+            if (child instanceof TaskView) {
+                TaskView taskView = (TaskView) child;
+                childPosition += Math.round(
+                        taskView.getPrimaryDismissTranslationProperty().get(taskView));
+            }
             int scrollDelta = Math.abs(curScroll - childPosition);
             if (scrollDelta > scaleArea) {
                 child.setScaleX(mScrollScale);

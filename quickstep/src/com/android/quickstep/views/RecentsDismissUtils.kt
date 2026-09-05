@@ -505,6 +505,9 @@ constructor(
         val neighboringTaskViewSpringAnimation =
             SpringAnimation(taskView, FloatPropertyCompat.createFloatPropertyCompat(springProperty))
                 .setSpring(createExpressiveDismissSpringForce(dampingOffsetRatio))
+        neighboringTaskViewSpringAnimation.addUpdateListener { _, _, _ ->
+            recentsView.doScrollScale()
+        }
         // Update live tile on spring animation.
         if (taskView.isRunningTask && recentsView.enableDrawingLiveTile) {
             neighboringTaskViewSpringAnimation.addUpdateListener { _, _, _ ->
@@ -715,6 +718,11 @@ constructor(
                         )
                         .setSpring(createExpressiveGridReflowSpringForce(dismissedTaskGap))
                         .setStartValue(startValue)
+                // The carousel scale is driven by distance from the centre, so it has to be
+                // recomputed as the task translates into the gap.
+                taskViewSpringAnimation.addUpdateListener { _, _, _ ->
+                    recentsView.doScrollScale()
+                }
                 // Update live tile on spring animation.
                 if (taskView.isRunningTask && recentsView.enableDrawingLiveTile) {
                     taskViewSpringAnimation.addUpdateListener { _, _, _ ->
