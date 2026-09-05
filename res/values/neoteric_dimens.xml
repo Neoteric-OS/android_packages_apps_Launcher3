@@ -8,4 +8,9 @@
     <!-- Overview scrolling scale animation -->
     <dimen name="overview_scroll_scale">0.9</dimen>
 
+    <!-- App info bottom sheet, Material 3 -->
+    <dimen name="app_info_sheet_corner_radius">28dp</dimen>
+    <dimen name="app_info_row_min_height">72dp</dimen>
+    <dimen name="app_info_row_icon_size">24dp</dimen>
+    <dimen name="app_info_sheet_horizontal_padding">24dp</dimen>
 </resources>
