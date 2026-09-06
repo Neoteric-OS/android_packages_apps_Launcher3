@@ -72,6 +72,7 @@ import com.android.launcher3.testing.shared.ResourceUtils;
 import com.android.launcher3.util.DaggerSingletonObject;
 import com.android.launcher3.util.DaggerSingletonTracker;
 import com.android.launcher3.util.ListenableDiffAwareRef;
+import com.android.launcher3.util.LockedUserState;
 import com.android.launcher3.util.LooperExecutor;
 import com.android.launcher3.util.Partner;
 import com.android.launcher3.util.SimpleBroadcastReceiver;
@@ -289,6 +290,12 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
         String gridName = prefs.get(GRID_NAME);
         initGrid(gridName);
         mThemeManager.generateIconShape(iconBitmapSize);
+
+        // The icon pack read above returns nothing pre-unlock, so re-read it once it is readable.
+        LockedUserState lockedUserState = LockedUserState.get(context);
+        if (!lockedUserState.isUserUnlocked()) {
+            lockedUserState.runOnUserUnlocked(this::onConfigChanged);
+        }
 
         ListenableDiffAwareRef<LauncherDisplayInfo, Integer> listenable = dc.getListenable();
         if (listenable != null) {
