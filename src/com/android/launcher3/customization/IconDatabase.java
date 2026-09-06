@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.UserManager;
 
 import com.android.launcher3.BuildConfig;
 import com.android.launcher3.LauncherPrefs;
@@ -17,6 +18,10 @@ public class IconDatabase {
     public static final String VALUE_DEFAULT = "";
 
     public static String getGlobal(Context context) {
+        // These prefs live in credential encrypted storage, absent until the user unlocks.
+        if (!context.getSystemService(UserManager.class).isUserUnlocked()) {
+            return VALUE_DEFAULT;
+        }
         return LauncherPrefs.getPrefs(context).getString(KEY_ICON_PACK, VALUE_DEFAULT);
     }
 
