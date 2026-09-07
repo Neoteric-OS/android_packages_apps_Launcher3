@@ -24,7 +24,10 @@ import androidx.preference.Preference;
 
 import com.android.launcher3.R;
 
-public abstract class RadioHeaderPreference extends Preference {
+import com.android.settingslib.widget.GroupSectionDividerMixin;
+
+public abstract class RadioHeaderPreference extends Preference
+        implements GroupSectionDividerMixin {
 
     public RadioHeaderPreference(Context context) {
         this(context, null);

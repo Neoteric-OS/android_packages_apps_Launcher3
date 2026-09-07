@@ -19,8 +19,6 @@ package com.android.launcher3.settings;
 import static androidx.preference.PreferenceFragmentCompat.ARG_PREFERENCE_ROOT;
 
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,6 +26,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.core.view.WindowCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference.OnPreferenceChangeListener;
 
@@ -39,14 +40,15 @@ import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
+import com.android.settingslib.widget.SettingsBasePreferenceFragment;
 
 import java.util.Collections;
 import java.util.List;
 
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
-import androidx.preference.PreferenceFragment.OnPreferenceStartFragmentCallback;
-import androidx.preference.PreferenceFragment.OnPreferenceStartScreenCallback;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartFragmentCallback;
+import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartScreenCallback;
 import androidx.preference.PreferenceGroup.PreferencePositionCallback;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
@@ -93,10 +95,12 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
                 args.putString(EXTRA_FRAGMENT_ROOT_KEY, root);
             }
 
-            Fragment f = Fragment.instantiate(
-                    this, getPreferenceFragment(), args);
+            final FragmentManager fm = getSupportFragmentManager();
+            final Fragment f = fm.getFragmentFactory().instantiate(getClassLoader(),
+                    getPreferenceFragment());
+            f.setArguments(args);
 
-            getFragmentManager().beginTransaction()
+            fm.beginTransaction()
                     .replace(R.id.content_frame, f)
                     .commit();
         }
@@ -123,14 +127,16 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
     }
 
     private boolean startPreference(String fragment, Bundle args, String key) {
-        if (getFragmentManager().isStateSaved()) {
+        final FragmentManager fm = getSupportFragmentManager();
+        if (fm.isStateSaved()) {
             // Sometimes onClick can come after onPause because of being posted on the handler.
             // Skip starting new preferences in that case.
             return false;
         }
-        Fragment f = Fragment.instantiate(this, fragment, args);
+        final Fragment f = fm.getFragmentFactory().instantiate(getClassLoader(), fragment);
         if (f instanceof DialogFragment) {
-            ((DialogFragment) f).show(getFragmentManager(), key);
+            f.setArguments(args);
+            ((DialogFragment) f).show(fm, key);
         } else {
             startActivity(new Intent(this, SettingsHomescreen.class)
                     .putExtra(EXTRA_FRAGMENT_ARGS, args));
@@ -140,12 +146,13 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
 
     @Override
     public boolean onPreferenceStartFragment(
-            PreferenceFragment preferenceFragment, Preference pref) {
+            PreferenceFragmentCompat preferenceFragment, Preference pref) {
         return startPreference(pref.getFragment(), pref.getExtras(), pref.getKey());
     }
 
     @Override
-    public boolean onPreferenceStartScreen(PreferenceFragment caller, PreferenceScreen pref) {
+    public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller,
+            PreferenceScreen pref) {
         Bundle args = new Bundle();
         args.putString(ARG_PREFERENCE_ROOT, pref.getKey());
         return startPreference(getString(R.string.home_category_title), args, pref.getKey());
@@ -163,7 +170,7 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
     /**
      * This fragment shows the launcher preferences.
      */
-    public static class HomescreenSettingsFragment extends PreferenceFragment {
+    public static class HomescreenSettingsFragment extends SettingsBasePreferenceFragment {
 
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;

@@ -35,6 +35,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartFragmentCallback;
 import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartScreenCallback;
+import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceGroup.PreferencePositionCallback;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,6 +55,7 @@ import com.android.launcher3.util.AppReloader;
 import com.android.launcher3.util.SettingsCache;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
+import com.android.settingslib.widget.SettingsBasePreferenceFragment;
 import com.android.settingslib.widget.SliderPreference;
 
 public class SettingsIcons extends CollapsingToolbarBaseActivity
@@ -158,7 +160,7 @@ public class SettingsIcons extends CollapsingToolbarBaseActivity
     /**
      * This fragment shows the launcher preferences.
      */
-    public static class IconsSettingsFragment extends PreferenceFragmentCompat implements
+    public static class IconsSettingsFragment extends SettingsBasePreferenceFragment implements
             SharedPreferences.OnSharedPreferenceChangeListener {
 
         private String mHighLightKey;
@@ -192,13 +194,7 @@ public class SettingsIcons extends CollapsingToolbarBaseActivity
         }
 
         private void updatePreferences() {
-            PreferenceScreen screen = getPreferenceScreen();
-            for (int i = screen.getPreferenceCount() - 1; i >= 0; i--) {
-                Preference preference = screen.getPreference(i);
-                if (!initPreference(preference)) {
-                    screen.removePreference(preference);
-                }
-            }
+            updatePreferences(getPreferenceScreen());
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {
                 getActivity().setTitle(getPreferenceScreen().getTitle());
@@ -235,6 +231,18 @@ public class SettingsIcons extends CollapsingToolbarBaseActivity
                 case IconDatabase.KEY_ICON_PACK:
                     updatePreferences();
                     break;
+            }
+        }
+
+        // Preferences live inside categories, so walk the whole tree rather than the top level.
+        private void updatePreferences(PreferenceGroup group) {
+            for (int i = group.getPreferenceCount() - 1; i >= 0; i--) {
+                Preference preference = group.getPreference(i);
+                if (preference instanceof PreferenceGroup) {
+                    updatePreferences((PreferenceGroup) preference);
+                } else if (!initPreference(preference)) {
+                    group.removePreference(preference);
+                }
             }
         }
 

@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.preference.Preference;
 
@@ -153,9 +154,33 @@ public final class IconPackSettingsFragment extends RadioSettingsFragment {
                 pref.setExtraWidgetOnClickListener((v) -> {
                     context.startActivity(intent);
                 });
+                pref.setExtraWidgetOnBindConsumer(IconPackSettingsFragment::hideDividerChevron);
             }
         }
         return pref;
+    }
+
+    /**
+     * The expressive two target divider draws a chevron ahead of its rule. These rows select an
+     * icon pack rather than navigate, so drop the chevron and keep the rule before the settings
+     * button.
+     */
+    private static void hideDividerChevron(ImageView extraWidget) {
+        if (extraWidget == null || !(extraWidget.getParent() instanceof View)) {
+            return;
+        }
+        final View divider = ((View) extraWidget.getParent()).findViewById(
+                com.android.settingslib.widget.theme.R.id.two_target_divider);
+        if (!(divider instanceof ViewGroup)) {
+            return;
+        }
+        final ViewGroup group = (ViewGroup) divider;
+        for (int i = 0; i < group.getChildCount(); i++) {
+            final View child = group.getChildAt(i);
+            if (child instanceof ImageView) {
+                child.setVisibility(View.GONE);
+            }
+        }
     }
 
     private static class IconPackInfo {

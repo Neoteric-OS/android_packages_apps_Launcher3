@@ -43,6 +43,7 @@ import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
+import com.android.settingslib.widget.SettingsBasePreferenceFragment;
 
 public class SettingsAppDrawer extends CollapsingToolbarBaseActivity
         implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback {
@@ -140,7 +141,7 @@ public class SettingsAppDrawer extends CollapsingToolbarBaseActivity
     /**
      * This fragment shows the launcher preferences.
      */
-    public static class AppDrawerSettingsFragment extends PreferenceFragmentCompat {
+    public static class AppDrawerSettingsFragment extends SettingsBasePreferenceFragment {
 
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;
