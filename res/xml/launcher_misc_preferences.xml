@@ -17,7 +17,8 @@
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
-    xmlns:settings="http://schemas.android.com/apk/res/com.android.launcher3">
+    xmlns:settings="http://schemas.android.com/apk/res/com.android.launcher3"
+    android:title="@string/misc_category_title">
 
 
     <androidx.preference.PreferenceScreen

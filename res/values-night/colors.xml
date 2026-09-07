@@ -17,4 +17,6 @@
 <resources>
     <!-- Home screen files -->
     <color name="home_screen_files_folder_icon_color">@color/system_primary_dark</color>
+    <!-- Matches the preview background on Settings > Display size and text. -->
+    <color name="icon_pack_preview_background">@android:color/black</color>
 </resources>

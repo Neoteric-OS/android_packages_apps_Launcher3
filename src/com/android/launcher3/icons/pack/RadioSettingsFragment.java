@@ -20,16 +20,16 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
 
 import com.android.settingslib.widget.SelectorWithWidgetPreference;
+import com.android.settingslib.widget.SettingsBasePreferenceFragment;
 
 import java.util.List;
 
-public abstract class RadioSettingsFragment extends PreferenceFragment implements
-        Preference.OnPreferenceClickListener {
+public abstract class RadioSettingsFragment extends SettingsBasePreferenceFragment
+        implements Preference.OnPreferenceClickListener {
     private SelectorWithWidgetPreference selectedPreference = null;
     private RadioHeaderPreference headerPref = null;
 
