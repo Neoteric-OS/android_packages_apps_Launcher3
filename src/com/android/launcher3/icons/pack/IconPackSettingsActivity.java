@@ -17,7 +17,6 @@ package com.android.launcher3.icons.pack;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -25,10 +24,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
-import androidx.preference.PreferenceFragment.OnPreferenceStartFragmentCallback;
-import androidx.preference.PreferenceFragment.OnPreferenceStartScreenCallback;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartFragmentCallback;
+import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartScreenCallback;
 import androidx.preference.PreferenceScreen;
 
 import com.android.launcher3.R;
@@ -51,27 +53,30 @@ public final class IconPackSettingsActivity extends CollapsingToolbarBaseActivit
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        setTitle(R.string.icon_pack_title);
 
         if (savedInstanceState == null) {
-            final Fragment f = Fragment.instantiate(this,
-                getString(R.string.icon_pack_settings_class), null);
+            final FragmentManager fm = getSupportFragmentManager();
+            final Fragment f = fm.getFragmentFactory().instantiate(getClassLoader(),
+                    getString(R.string.icon_pack_settings_class));
             // Display the fragment as the main content.
-            getFragmentManager().beginTransaction()
+            fm.beginTransaction()
                     .replace(com.android.settingslib.collapsingtoolbar.R.id.content_frame, f)
                     .commit();
         }
     }
 
     private boolean startFragment(String fragment, Bundle args, String key) {
-        if (getFragmentManager().isStateSaved()) {
+        final FragmentManager fm = getSupportFragmentManager();
+        if (fm.isStateSaved()) {
             // Sometimes onClick can come after onPause because of being posted on the handler.
             // Skip starting new fragments in that case.
             return false;
         }
 
-        final Fragment f = Fragment.instantiate(this, fragment, args);
-        getFragmentManager()
-                .beginTransaction()
+        final Fragment f = fm.getFragmentFactory().instantiate(getClassLoader(), fragment);
+        f.setArguments(args);
+        fm.beginTransaction()
                 .replace(com.android.settingslib.collapsingtoolbar.R.id.content_frame, f)
                 .addToBackStack(key)
                 .commit();
@@ -79,15 +84,16 @@ public final class IconPackSettingsActivity extends CollapsingToolbarBaseActivit
     }
 
     @Override
-    public boolean onPreferenceStartFragment(PreferenceFragment preferenceFragment,
+    public boolean onPreferenceStartFragment(PreferenceFragmentCompat preferenceFragment,
             Preference pref) {
         return startFragment(pref.getFragment(), pref.getExtras(), pref.getKey());
     }
 
     @Override
-    public boolean onPreferenceStartScreen(PreferenceFragment caller, PreferenceScreen pref) {
+    public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller,
+            PreferenceScreen pref) {
         Bundle args = new Bundle();
-        args.putString(PreferenceFragment.ARG_PREFERENCE_ROOT, pref.getKey());
+        args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, pref.getKey());
         return startFragment(getString(R.string.icon_pack_settings_class),
                 args, pref.getKey());
     }
