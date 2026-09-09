@@ -27,6 +27,7 @@ public class SmartspaceViewContainer extends LauncherAppWidgetHostView
         implements PluginListener<BcSmartspaceDataPlugin> {
 
     public BcSmartspaceView mView;
+    private final BcSmartspaceDataProvider mPlugin;
 
     public SmartspaceViewContainer(Context context) {
         super(context);
@@ -44,14 +45,20 @@ public class SmartspaceViewContainer extends LauncherAppWidgetHostView
                 .getDimensionPixelSize(R.dimen.enhanced_smartspace_margin_start_launcher));
         addView(mView, layoutParams);
 
-        CustomLauncher launcher = (CustomLauncher) ActivityContext.lookupContext(context);
-        launcher.getLauncherUnlockAnimationController().setSmartspaceView(mView);
+        // The preview renderer inflates the workspace outside of Launcher, so there is nothing to
+        // feed targets or the unlock animation; the view still draws its default date card.
+        Context activityContext = ActivityContext.lookupContext(context);
+        if (activityContext instanceof CustomLauncher launcher) {
+            mPlugin = launcher.getSmartspacePlugin();
+            launcher.getLauncherUnlockAnimationController().setSmartspaceView(mView);
 
-        CustomLauncherModelDelegate delegate =
-                (CustomLauncherModelDelegate) launcher.getModel().getModelDelegate();
-        BcSmartspaceDataProvider plugin = launcher.getSmartspacePlugin();
-        plugin.setEventDispatcher(event -> delegate.notifySmartspaceEvent(event));
-        mView.registerDataProvider(plugin);
+            CustomLauncherModelDelegate delegate =
+                    (CustomLauncherModelDelegate) launcher.getModel().getModelDelegate();
+            mPlugin.setEventDispatcher(event -> delegate.notifySmartspaceEvent(event));
+        } else {
+            mPlugin = new BcSmartspaceDataProvider();
+        }
+        mView.registerDataProvider(mPlugin);
     }
 
     @Override
@@ -76,8 +83,7 @@ public class SmartspaceViewContainer extends LauncherAppWidgetHostView
 
     @Override
     public void onPluginDisconnected(BcSmartspaceDataPlugin plugin) {
-        CustomLauncher launcher = (CustomLauncher) ActivityContext.lookupContext(getContext());
-        mView.registerDataProvider(launcher.getSmartspacePlugin());
+        mView.registerDataProvider(mPlugin);
     }
 
     @Override
