@@ -49,6 +49,8 @@ public class WallpaperOffsetInterpolator implements
     private int mNumScreens;
 
     private boolean mAllowScrolling;
+    private boolean mShortParallax;
+    private boolean mSinglePageCentered;
 
     public WallpaperOffsetInterpolator(Workspace<?> workspace) {
         mContext = workspace.getContext();
@@ -59,6 +61,8 @@ public class WallpaperOffsetInterpolator implements
         mHandler = new OffsetHandler(workspace.getContext());
         SharedPreferences prefs = LauncherPrefs.getPrefs(workspace.getContext());
         mAllowScrolling = prefs.getBoolean(KEY_WALLPAPER_SCROLLING, true);
+        mShortParallax = Utilities.isShortParallax(mContext);
+        mSinglePageCentered = Utilities.isSinglePageCentered(mContext);
         prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -77,11 +81,15 @@ public class WallpaperOffsetInterpolator implements
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
         if (key.equals(KEY_WALLPAPER_SCROLLING)) {
             mAllowScrolling = prefs.getBoolean(KEY_WALLPAPER_SCROLLING, true);
+        } else if (key.equals(Utilities.KEY_SHORT_PARALLAX)) {
+            mShortParallax = Utilities.isShortParallax(mContext);
+        } else if (key.equals(Utilities.KEY_SINGLE_PAGE_CENTER)) {
+            mSinglePageCentered = Utilities.isSinglePageCentered(mContext);
         }
     }
 
     private int getMinimumScrollableScreensForParallax() {
-        return Utilities.isSinglePageCentered(mWorkspace.getContext()) ? 0 : 1;
+        return mSinglePageCentered ? 0 : 1;
     }
 
     /**
@@ -212,7 +220,7 @@ public class WallpaperOffsetInterpolator implements
 
     private int getMinParallaxPageSpan() {
         // Don't use all the wallpaper for parallax until you have at least this many pages
-        return Utilities.isShortParallax(mWorkspace.getContext()) ? 1 : 4;
+        return mShortParallax ? 1 : 4;
     }
 
     @AnyThread
