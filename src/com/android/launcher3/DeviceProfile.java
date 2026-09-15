@@ -273,7 +273,7 @@ public class DeviceProfile {
             ResponsiveCellSpecsProvider workspaceCellSpecs = ResponsiveCellSpecsProvider.create(
                     new ResourceHelper(context, displayOptionSpec.workspaceCellSpecsId));
             mResponsiveWorkspaceCellSpec = workspaceCellSpecs.getCalculatedSpec(
-                    responsiveAspectRatio, mDeviceProperties.getHeightPx());
+                    responsiveAspectRatio, mDeviceProperties.getHeightPx()).withUserSizes(context);
         }
 
         int qsbHeight = mIsHotseatQsbEnabled ? res.getDimensionPixelSize(R.dimen.qsb_widget_height) : 0;
@@ -359,7 +359,7 @@ public class DeviceProfile {
             mResponsiveAllAppsCellSpec = allAppsCellSpecs.getCalculatedSpec(
                     responsiveAspectRatio,
                     mResponsiveAllAppsHeightSpec.getAvailableSpace(),
-                    mResponsiveWorkspaceCellSpec);
+                    mResponsiveWorkspaceCellSpec).withUserSizes(context);
         }
 
         mWorkspaceProfile = WorkspaceProfile.Factory.createWorkspaceProfile(
