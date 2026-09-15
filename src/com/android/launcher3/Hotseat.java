@@ -275,6 +275,7 @@ public class Hotseat extends CellLayout implements Insettable {
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) getLayoutParams();
         DeviceProfile grid = mActivity.getDeviceProfile();
 
+        int topOverlap = 0;
         if (grid.isVerticalBarLayout()) {
             if (mQsb != null) mQsb.setVisibility(View.GONE);
             lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -291,11 +292,13 @@ public class Hotseat extends CellLayout implements Insettable {
             }
             lp.gravity = Gravity.BOTTOM;
             lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            lp.height = grid.getHotseatProfile().getBarSizePx();
+            int totalHeightForQsb = grid.getQsbOffsetY() + grid.getHotseatProfile().getQsbHeight();
+            topOverlap = Math.max(0, totalHeightForQsb - grid.getHotseatProfile().getBarSizePx());
+            lp.height = grid.getHotseatProfile().getBarSizePx() + topOverlap;
         }
 
         Rect padding = grid.getHotseatLayoutPadding(getContext());
-        setPadding(padding.left, padding.top, padding.right, padding.bottom);
+        setPadding(padding.left, padding.top + topOverlap, padding.right, padding.bottom);
         setLayoutParams(lp);
         InsettableFrameLayout.dispatchInsets(this, insets);
     }

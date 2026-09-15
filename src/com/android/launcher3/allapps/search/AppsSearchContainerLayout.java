@@ -15,12 +15,7 @@
  */
 package com.android.launcher3.allapps.search;
 
-import static android.view.View.MeasureSpec.EXACTLY;
-import static android.view.View.MeasureSpec.getSize;
-import static android.view.View.MeasureSpec.makeMeasureSpec;
-
 import static com.android.launcher3.Utilities.prefixTextWithIcon;
-import static com.android.launcher3.icons.IconNormalizer.ICON_VISIBLE_AREA_FACTOR;
 
 import android.content.Context;
 import android.content.Intent;
@@ -30,10 +25,8 @@ import android.text.SpannableStringBuilder;
 import android.text.method.TextKeyListener;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 
-import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.ExtendedEditText;
 import com.android.launcher3.Insettable;
 import com.android.launcher3.R;
@@ -62,9 +55,6 @@ public class AppsSearchContainerLayout extends ExtendedEditText
 
     private ActivityAllAppsContainerView<?> mAppsView;
 
-    // The amount of pixels to shift down and overlap with the rest of the content.
-    private final int mContentOverlap;
-
     public AppsSearchContainerLayout(Context context) {
         this(context, null);
     }
@@ -81,9 +71,6 @@ public class AppsSearchContainerLayout extends ExtendedEditText
 
         mSearchQueryBuilder = new SpannableStringBuilder();
         Selection.setSelection(mSearchQueryBuilder, 0);
-
-        mContentOverlap =
-                getResources().getDimensionPixelSize(R.dimen.all_apps_search_bar_content_overlap);
     }
 
     @Override
@@ -98,48 +85,6 @@ public class AppsSearchContainerLayout extends ExtendedEditText
         super.onDetachedFromWindow();
         if(mAppsView != null)
             mAppsView.getAppsStore().removeUpdateListener(this);
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        DeviceProfile dp = mLauncher.getDeviceProfile();
-        if (!dp.getHotseatProfile().isQsbInline()) {
-            // Share the hotseat search bar's width, so the drawer search bar, the home screen
-            // search bar and the dock icons all start and end on the same edge. The inline
-            // (tablet) hotseat QSB is a different shape, so that case keeps the grid maths.
-            super.onMeasure(makeMeasureSpec(dp.getHotseatQsbWidth(), EXACTLY), heightMeasureSpec);
-            return;
-        }
-
-        // Update the width to match the grid padding
-        int myRequestedWidth = getSize(widthMeasureSpec);
-        int rowWidth = myRequestedWidth - mAppsView.getActiveRecyclerView().getPaddingLeft()
-                - mAppsView.getActiveRecyclerView().getPaddingRight();
-
-        int cellWidth = DeviceProfile.calculateCellWidth(rowWidth,
-                dp.getWorkspaceProfile().getCellLayoutBorderSpacePx().x,
-                dp.getHotseatProfile().getNumShownIcons());
-        int iconVisibleSize =
-                Math.round(ICON_VISIBLE_AREA_FACTOR * dp.getWorkspaceProfile().getIconSizePx());
-        int iconPadding = cellWidth - iconVisibleSize;
-
-        int myWidth = rowWidth - iconPadding + getPaddingLeft() + getPaddingRight();
-        super.onMeasure(makeMeasureSpec(myWidth, EXACTLY), heightMeasureSpec);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-
-        // Shift the widget horizontally so that its centered in the parent (b/63428078)
-        View parent = (View) getParent();
-        int availableWidth = parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight();
-        int myWidth = right - left;
-        int expectedLeft = parent.getPaddingLeft() + (availableWidth - myWidth) / 2;
-        int shift = expectedLeft - left;
-        setTranslationX(shift);
-
-        offsetTopAndBottom(mContentOverlap);
     }
 
     @Override
@@ -207,17 +152,13 @@ public class AppsSearchContainerLayout extends ExtendedEditText
 
     @Override
     public void setInsets(Rect insets) {
-        DeviceProfile dp = mLauncher.getDeviceProfile();
         MarginLayoutParams mlp = (MarginLayoutParams) getLayoutParams();
-        if (mAppsView.getSearchUiDelegate().isSearchBarFloating()
-                || dp.getDeviceProperties().isLargeScreen()) {
-            mlp.topMargin = dp.getDeviceProperties().isLargeScreen()
-                    ? mContentOverlap + getResources().getDimensionPixelSize(
-                            R.dimen.all_apps_search_bar_bottom_adjustment)
-                            - getResources().getDimensionPixelSize(
-                                    R.dimen.all_apps_search_top_row_extra_height)
-                    : insets.top;
-        }
+        mlp.topMargin =
+                getResources().getDimensionPixelOffset(R.dimen.bottom_sheet_handle_area_height);
+        int margin = mLauncher.getDeviceProfile().getAllAppsIconStartMargin(getContext());
+        mlp.setMarginStart(margin);
+        mlp.setMarginEnd(margin);
+        setLayoutParams(mlp);
         requestLayout();
     }
 
