@@ -5757,7 +5757,8 @@ public abstract class RecentsView<
     }
 
     protected void doScrollScale() {
-        if (showAsGrid() || mContainer.getDeviceProfile().getDeviceProperties().isLargeScreen())
+        if (mPageScrolls == null || showAsGrid()
+                || mContainer.getDeviceProfile().getDeviceProperties().isLargeScreen())
             return;
 
         //nick@lmo-20231004 if rotating launcher is enabled, rotation works differently
@@ -5808,6 +5809,9 @@ public abstract class RecentsView<
     }
 
     public float getScrollScale(RemoteTargetHandle rth) {
+        if (mPageScrolls == null) {
+            return 1f;
+        }
         int childCount = Math.min(mPageScrolls.length, getChildCount());
         for (int i = 0; i < childCount; i++) {
             View child = getChildAt(i);
