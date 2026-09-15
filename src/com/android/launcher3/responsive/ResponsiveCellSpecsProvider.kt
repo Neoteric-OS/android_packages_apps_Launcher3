@@ -16,13 +16,18 @@
 
 package com.android.launcher3.responsive
 
+import android.content.Context
 import android.content.res.TypedArray
 import android.util.Log
 import com.android.launcher3.Flags.enableScalabilityForDesktopExperience
+import com.android.launcher3.InvariantDeviceProfile.KEY_FONT_SIZE
+import com.android.launcher3.InvariantDeviceProfile.KEY_ICON_SIZE
 import com.android.launcher3.R
+import com.android.launcher3.deviceprofile.parser.DisplayOption
 import com.android.launcher3.responsive.ResponsiveSpec.Companion.ResponsiveSpecType
 import com.android.launcher3.responsive.ResponsiveSpec.DimensionType
 import com.android.launcher3.util.ResourceHelper
+import kotlin.math.roundToInt
 
 class ResponsiveCellSpecsProvider(groupOfSpecs: List<ResponsiveSpecGroup<CellSpec>>) {
     private val groupOfSpecs: List<ResponsiveSpecGroup<CellSpec>>
@@ -209,6 +214,18 @@ data class CalculatedCellSpec(
             else spec.iconTextMaxLineCount,
         iconTextMaxLineCountMatchesWorkspace = spec.iconTextMaxLineCountMatchesWorkspace,
     )
+
+    fun withUserSizes(context: Context): CalculatedCellSpec {
+        val iconScale = DisplayOption.readSizePercent(context, KEY_ICON_SIZE) / 100f
+        val textScale = DisplayOption.readSizePercent(context, KEY_FONT_SIZE) / 100f
+        return copy(
+            iconSize =
+                if (spec.iconSize.matchWorkspace) iconSize else (iconSize * iconScale).roundToInt(),
+            iconTextSize =
+                if (spec.iconTextSize.matchWorkspace) iconTextSize
+                else (iconTextSize * textScale).roundToInt(),
+        )
+    }
 
     companion object {
         private const val LOG_TAG = "CalculatedCellSpec"

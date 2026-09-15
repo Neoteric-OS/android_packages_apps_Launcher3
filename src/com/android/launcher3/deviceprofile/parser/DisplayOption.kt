@@ -277,7 +277,8 @@ private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedA
          * before user 0 is unlocked), where credential-encrypted preferences are unreadable. Fall
          * back to 100% in that case rather than taking down SystemUI's launcher process.
          */
-        private fun readSizePercent(context: Context, key: String): Int =
+        @JvmStatic
+        fun readSizePercent(context: Context, key: String): Int =
             try {
                 LauncherPrefs.getPrefs(context).getInt(key, 100)
             } catch (ignored: IllegalStateException) {
