@@ -6,14 +6,13 @@
 
         <cellSpec
             launcher:dimensionType="height"
-            launcher:maxAvailableSize="9999dp"
-            launcher:maxLineCountMatchesWorkspace="true">
+            launcher:maxAvailableSize="9999dp">
             <iconDrawablePadding
-                launcher:matchWorkspace="true" />
+                launcher:fixedSize="8dp" />
             <iconSize
-                launcher:matchWorkspace="true" />
+                launcher:fixedSize="@dimen/iconSize60dp" />
             <iconTextSize
-                launcher:matchWorkspace="true" />
+                launcher:fixedSize="14sp" />
         </cellSpec>
     </specs>
 </cellSpecs>

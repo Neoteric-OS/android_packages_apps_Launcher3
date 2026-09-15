@@ -18,6 +18,14 @@
 <profiles xmlns:launcher="http://schemas.android.com/apk/res-auto" >
 
     <grid-option
+        launcher:allAppsCellSpecsId="@xml/spec_handheld_all_apps_cell_2x2"
+        launcher:allAppsSpecsId="@xml/spec_handheld_all_apps_2x2"
+        launcher:devicePaddingId="@xml/paddings_2x2"
+        launcher:folderSpecsId="@xml/spec_handheld_folder_2x2"
+        launcher:hotseatSpecsId="@xml/spec_handheld_hotseat_2x2"
+        launcher:numAllAppsRowsForCellHeightCalculation="4"
+        launcher:workspaceCellSpecsId="@xml/spec_handheld_workspace_cell_2x2"
+        launcher:workspaceSpecsId="@xml/spec_handheld_workspace_2x2"
         launcher:name="2_by_2"
         launcher:numRows="2"
         launcher:numColumns="2"
@@ -51,6 +59,14 @@
     </grid-option>
 
     <grid-option
+        launcher:allAppsCellSpecsId="@xml/spec_handheld_all_apps_cell_3x3"
+        launcher:allAppsSpecsId="@xml/spec_handheld_all_apps_col"
+        launcher:devicePaddingId="@xml/paddings_3_col"
+        launcher:folderSpecsId="@xml/spec_handheld_folder_3x3"
+        launcher:hotseatSpecsId="@xml/spec_handheld_hotseat_3x3"
+        launcher:numAllAppsRowsForCellHeightCalculation="4"
+        launcher:workspaceCellSpecsId="@xml/spec_handheld_workspace_cell_3x3"
+        launcher:workspaceSpecsId="@xml/spec_handheld_workspace_3_col"
         launcher:name="3_by_3"
         launcher:numRows="3"
         launcher:numColumns="3"
@@ -83,6 +99,13 @@
     </grid-option>
 
     <grid-option
+        launcher:allAppsCellSpecsId="@xml/spec_all_apps_cell_match_workspace"
+        launcher:allAppsSpecsId="@xml/spec_handheld_all_apps"
+        launcher:devicePaddingId="@xml/paddings_4_col"
+        launcher:folderSpecsId="@xml/spec_handheld_folder_4_col"
+        launcher:hotseatSpecsId="@xml/spec_handheld_hotseat_4_col"
+        launcher:workspaceCellSpecsId="@xml/spec_handheld_workspace_cell_4_col"
+        launcher:workspaceSpecsId="@xml/spec_handheld_workspace_4_col"
         launcher:name="4_by_4"
         launcher:numRows="4"
         launcher:numColumns="4"
@@ -113,6 +136,13 @@
     </grid-option>
 
     <grid-option
+        launcher:allAppsCellSpecsId="@xml/spec_all_apps_cell_match_workspace"
+        launcher:allAppsSpecsId="@xml/spec_handheld_all_apps"
+        launcher:devicePaddingId="@xml/paddings_4_col"
+        launcher:folderSpecsId="@xml/spec_handheld_folder_4_col"
+        launcher:hotseatSpecsId="@xml/spec_handheld_hotseat_4_col"
+        launcher:workspaceCellSpecsId="@xml/spec_handheld_workspace_cell_4_col"
+        launcher:workspaceSpecsId="@xml/spec_handheld_workspace_4_col"
         launcher:name="4_by_5"
         launcher:numRows="5"
         launcher:numColumns="4"
@@ -147,6 +177,13 @@
     </grid-option>
 
     <grid-option
+        launcher:allAppsCellSpecsId="@xml/spec_all_apps_cell_match_workspace"
+        launcher:allAppsSpecsId="@xml/spec_handheld_all_apps"
+        launcher:devicePaddingId="@xml/paddings_5_col"
+        launcher:folderSpecsId="@xml/spec_handheld_folder_5_col"
+        launcher:hotseatSpecsId="@xml/spec_handheld_hotseat_5_col"
+        launcher:workspaceCellSpecsId="@xml/spec_handheld_workspace_cell_5_col"
+        launcher:workspaceSpecsId="@xml/spec_handheld_workspace_5_col"
         launcher:name="5_by_5"
         launcher:numRows="5"
         launcher:numColumns="5"
@@ -179,6 +216,13 @@
     </grid-option>
 
     <grid-option
+        launcher:allAppsCellSpecsId="@xml/spec_all_apps_cell_match_workspace"
+        launcher:allAppsSpecsId="@xml/spec_handheld_all_apps"
+        launcher:devicePaddingId="@xml/paddings_5_col"
+        launcher:folderSpecsId="@xml/spec_handheld_folder_5_col"
+        launcher:hotseatSpecsId="@xml/spec_handheld_hotseat_5_col"
+        launcher:workspaceCellSpecsId="@xml/spec_handheld_workspace_cell_5_col"
+        launcher:workspaceSpecsId="@xml/spec_handheld_workspace_5_col"
         launcher:name="5_by_6"
         launcher:numRows="6"
         launcher:numColumns="5"
@@ -209,6 +253,13 @@
     </grid-option>
 
     <grid-option
+        launcher:allAppsCellSpecsId="@xml/spec_all_apps_cell_match_workspace"
+        launcher:allAppsSpecsId="@xml/spec_handheld_all_apps"
+        launcher:devicePaddingId="@xml/paddings_5_col"
+        launcher:folderSpecsId="@xml/spec_handheld_folder_5_col"
+        launcher:hotseatSpecsId="@xml/spec_handheld_hotseat_5_col"
+        launcher:workspaceCellSpecsId="@xml/spec_handheld_workspace_cell_5_col"
+        launcher:workspaceSpecsId="@xml/spec_handheld_workspace_5_col"
         launcher:name="5_by_7"
         launcher:numRows="7"
         launcher:numColumns="5"
@@ -249,6 +300,13 @@
         launcher:inlineNavButtonsEndSpacing="@dimen/taskbar_button_margin_6_5"
         launcher:inlineQsb="landscape"
         launcher:isScalable="true"
+        launcher:allAppsCellSpecsId="@xml/spec_all_apps_cell_match_workspace"
+        launcher:allAppsSpecsId="@xml/spec_tablet_all_apps_6x5"
+        launcher:devicePaddingId="@xml/paddings_6x5"
+        launcher:folderSpecsId="@xml/spec_tablet_folder_6x5"
+        launcher:hotseatSpecsId="@xml/spec_tablet_hotseat_6x5"
+        launcher:workspaceCellSpecsId="@xml/spec_tablet_workspace_cell_6x5"
+        launcher:workspaceSpecsId="@xml/spec_tablet_workspace_6x5"
         launcher:name="tablet_normal"
         launcher:numAllAppsColumns="6"
         launcher:numColumns="6"

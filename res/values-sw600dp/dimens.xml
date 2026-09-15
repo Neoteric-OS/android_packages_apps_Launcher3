@@ -44,6 +44,9 @@
     <dimen name="drop_target_button_drawable_vertical_padding">16dp</dimen>
     <dimen name="dynamic_grid_drop_target_size">56dp</dimen>
 
+<!-- All Apps -->
+    <dimen name="all_apps_search_bar_content_overlap">0dp</dimen>
+
 <!-- Workspace grid visualization parameters -->
     <dimen name="grid_visualization_horizontal_cell_spacing">6dp</dimen>
 </resources>
