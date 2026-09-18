@@ -631,7 +631,13 @@ public class DeviceProfile {
     }
 
     public void updateInsets(Rect insets) {
+        // All apps padding was derived from the insets when this profile was built, so carry the
+        // change across instead of leaving it at whatever the insets were back then.
+        int deltaTop = insets.top - mDeviceProperties.getInsets().top;
         mDeviceProperties.getInsets().set(insets);
+        if (deltaTop != 0) {
+            getAllAppsProfile().getPadding().top += deltaTop;
+        }
     }
 
     /**
