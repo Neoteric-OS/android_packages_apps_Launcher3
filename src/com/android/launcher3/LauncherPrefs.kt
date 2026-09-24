@@ -317,11 +317,12 @@ constructor(@ApplicationContext private val encryptedContext: Context) {
 
         @JvmField val ENABLE_COMPOSITION_TRACING = backedUpItem(COMPOSITION_TRACING_PREF_KEY, false)
 
-        @JvmField
-        val FIXED_LANDSCAPE_MODE = backedUpItem(SettingsMisc.FIXED_LANDSCAPE_MODE, false)
+        @JvmField val FIXED_LANDSCAPE_MODE = backedUpItem(SettingsMisc.FIXED_LANDSCAPE_MODE, false)
 
         @JvmField
         val WORKSPACE_ITEMS_LABEL_HIDDEN = backedUpItem("pref_workspace_items_label_hidden", false)
+
+        @JvmField val SHOW_ALL_APPS_ITEM_LABELS = backedUpItem("pref_drawer_show_labels", true)
 
         @JvmField
         val EXPANDED_POPUP_MENU_SECTION =

@@ -21,6 +21,7 @@ import static com.android.launcher3.LauncherPrefs.ENABLE_TWOLINE_ALLAPPS_TOGGLE;
 import static com.android.launcher3.LauncherPrefs.FIXED_LANDSCAPE_MODE;
 import static com.android.launcher3.LauncherPrefs.GRID_NAME;
 import static com.android.launcher3.LauncherPrefs.NON_FIXED_LANDSCAPE_GRID_NAME;
+import static com.android.launcher3.LauncherPrefs.SHOW_ALL_APPS_ITEM_LABELS;
 import static com.android.launcher3.LauncherPrefs.SHOW_HOTSEAT_QSB;
 import static com.android.launcher3.LauncherPrefs.WORKSPACE_ITEMS_LABEL_HIDDEN;
 import static com.android.launcher3.Utilities.dpiFromPx;
@@ -116,8 +117,7 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
     private static final float ICON_SIZE_DEFINED_IN_APP_DP = 48;
 
     public static final String KEY_ALLAPPS_THEMED_ICONS = "pref_allapps_themed_icons";
-    public static final String KEY_SHOW_DESKTOP_LABELS = "pref_desktop_show_labels";
-    public static final String KEY_SHOW_DRAWER_LABELS = "pref_drawer_show_labels";
+    private static final String LEGACY_SHOW_WORKSPACE_ITEM_LABELS = "pref_desktop_show_labels";
     public static final String KEY_WORKSPACE_LOCK = "pref_workspace_lock";
     public static final String KEY_ICON_SIZE = "pref_custom_icon_size";
     public static final String KEY_FONT_SIZE = "pref_custom_font_size";
@@ -278,6 +278,15 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
             @Ui final LooperExecutor mainExecutor) {
         mContext = context;
         SharedPreferences sharedPrefs = LauncherPrefs.getPrefs(context);
+        if (!sharedPrefs.contains(WORKSPACE_ITEMS_LABEL_HIDDEN.getSharedPrefKey())
+                && sharedPrefs.contains(LEGACY_SHOW_WORKSPACE_ITEM_LABELS)) {
+            sharedPrefs.edit()
+                    .putBoolean(
+                            WORKSPACE_ITEMS_LABEL_HIDDEN.getSharedPrefKey(),
+                            !sharedPrefs.getBoolean(LEGACY_SHOW_WORKSPACE_ITEM_LABELS, true))
+                    .remove(LEGACY_SHOW_WORKSPACE_ITEM_LABELS)
+                    .apply();
+        }
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
         mDisplayController = dc;
@@ -325,15 +334,17 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
             } else if (WORKSPACE_ITEMS_LABEL_HIDDEN.getSharedPrefKey().equals(key)
                     && com.android.systemui.shared.Flags.workspaceItemsLabelHidden()) {
                 onConfigChanged();
+            } else if (SHOW_ALL_APPS_ITEM_LABELS.getSharedPrefKey().equals(key)) {
+                onConfigChanged();
             } else if (SHOW_HOTSEAT_QSB.getSharedPrefKey().equals(key)) {
                 onConfigChanged();
             }
         };
         prefs.addListener(prefListener, FIXED_LANDSCAPE_MODE, ENABLE_TWOLINE_ALLAPPS_TOGGLE,
-                WORKSPACE_ITEMS_LABEL_HIDDEN, SHOW_HOTSEAT_QSB);
+                WORKSPACE_ITEMS_LABEL_HIDDEN, SHOW_ALL_APPS_ITEM_LABELS, SHOW_HOTSEAT_QSB);
         lifeCycle.addCloseable(() -> prefs.removeListener(prefListener,
                 FIXED_LANDSCAPE_MODE, ENABLE_TWOLINE_ALLAPPS_TOGGLE,
-                WORKSPACE_ITEMS_LABEL_HIDDEN, SHOW_HOTSEAT_QSB));
+                WORKSPACE_ITEMS_LABEL_HIDDEN, SHOW_ALL_APPS_ITEM_LABELS, SHOW_HOTSEAT_QSB));
 
         SimpleBroadcastReceiver localeReceiver = new SimpleBroadcastReceiver(context,
                 mMainExecutor, i -> onConfigChanged());
@@ -350,8 +361,7 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-        if (KEY_ALLAPPS_THEMED_ICONS.equals(key) || KEY_SHOW_DESKTOP_LABELS.equals(key)
-                || KEY_SHOW_DRAWER_LABELS.equals(key) || KEY_ICON_SIZE.equals(key)
+        if (KEY_ALLAPPS_THEMED_ICONS.equals(key) || KEY_ICON_SIZE.equals(key)
                 || KEY_FONT_SIZE.equals(key)
                 || IconDatabase.KEY_ICON_PACK.equals(key)) {
             onConfigChanged();

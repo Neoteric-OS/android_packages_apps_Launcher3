@@ -32,12 +32,6 @@
     <string name="settings_lock_layout_summary_off">可以在主屏上添加、移除或移动图标和小部件</string>
     <string name="settings_edit_widgets_error">无法在主屏上添加小部件</string>
 
-    <!-- Hide labels -->
-    <string name="title_desktop_labels">桌面标签</string>
-    <string name="summary_desktop_labels">在桌面上显示图标标签</string>
-    <string name="title_drawer_labels">抽屉标签</string>
-    <string name="summary_drawer_labels">在应用抽屉中显示图标标签</string>
-
     <!-- Settings title to show Google Now at -1 screen on launcher. [CHAR LIMIT=50] -->
     <string name="title_show_google_app">滑动访问 Google 应用</string>
 
