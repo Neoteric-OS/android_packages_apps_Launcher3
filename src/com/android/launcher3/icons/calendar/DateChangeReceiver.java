@@ -11,8 +11,8 @@ import static com.android.launcher3.util.Executors.MODEL_EXECUTOR;
 import com.android.launcher3.LauncherModel;
 import com.android.launcher3.util.ComponentKey;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.android.launcher3.util.AppReloader;
 
@@ -21,7 +21,7 @@ import com.android.launcher3.util.AppReloader;
  * when the date has changed.
  */
 public class DateChangeReceiver extends BroadcastReceiver {
-    private final Set<ComponentKey> mDynamicCalendars = new HashSet<>();
+    private final Set<ComponentKey> mDynamicCalendars = ConcurrentHashMap.newKeySet();
 
     public DateChangeReceiver(Context context) {
         super();
